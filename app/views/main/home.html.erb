@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Коктейль-квиз · НАПИ:БАР</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F5F0E8;
+            background-image: radial-gradient(circle at 20% 30%, rgba(233, 30, 99, 0.06) 0%, transparent 35%),
+                              radial-gradient(circle at 90% 70%, rgba(45, 45, 45, 0.04) 0%, transparent 45%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 12px;
+            color: #2D2D2D;
+        }
+
+        .app-screen {
+            max-width: 390px;
+            width: 100%;
+            background: rgba(245, 240, 232, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px;
+            box-shadow: 0 30px 50px -20px rgba(45, 45, 45, 0.25);
+            padding: 28px 20px 36px;
+            position: relative;
+            overflow: hidden;
+            transition: opacity 0.25s ease;
+            border: 1px solid rgba(45, 45, 45, 0.08);
+            min-height: 800px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .scene {
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .scene.active {
+            display: flex;
+        }
+
+        h1, h2, h3, p {
+            font-weight: 400;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        .headline-large {
+            font-size: 32px;
+            font-weight: 600;
+            color: #2D2D2D;
+            line-height: 1.15;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .headline-medium {
+            font-size: 26px;
+            font-weight: 500;
+            color: #2D2D2D;
+            text-align: center;
+        }
+
+        .subhead {
+            font-size: 15px;
+            font-weight: 400;
+            color: #8B7355;
+            margin-bottom: 6px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .micro-text {
+            font-size: 12px;
+            font-weight: 400;
+            color: #8B7355;
+            opacity: 0.85;
+            letter-spacing: 0.2px;
+            text-align: center;
+        }
+
+        .brand-logo {
+            position: absolute;
+            top: 20px;
+            left: 24px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-logo img {
+            height: 32px;
+            width: auto;
+        }
+
+        .brand-logo-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2D2D2D;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-logo-text span {
+            color: #E91E6D;
+        }
+
+        .cocktail-image-large {
+            width: 100%;
+            max-width: 240px;
+            aspect-ratio: 3/4;
+            margin: 8px auto 20px;
+            border-radius: 120px 120px 50px 50px;
+            box-shadow: 0 20px 40px -15px rgba(45, 45, 45, 0.2);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(45, 45, 45, 0.1);
+            background-size: cover;
+            background-position: center;
+            background-color: #F5F0E8;
+        }
+
+        .cocktail-story-image {
+            width: 180px;
+            height: 240px;
+            margin: 8px auto 16px;
+            border-radius: 120px 120px 50px 50px;
+            box-shadow: 0 24px 36px -18px rgba(45, 45, 45, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(45, 45, 45, 0.12);
+            background-size: cover;
+            background-position: center;
+            background-color: #F5F0E8;
+        }
+
+        .section-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(45, 45, 45, 0.15), transparent);
+            margin: 20px 0;
+        }
+
+        .bonus-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 22px 18px;
+            border: 1px solid rgba(45, 45, 45, 0.1);
+            box-shadow: 0 8px 24px -12px rgba(45, 45, 45, 0.12);
+            width: 100%;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .bonus-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2D2D2D;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.7;
+        }
+
+        .promo-code {
+            font-size: 32px;
+            font-weight: 700;
+            color: #E91E6D;
+            letter-spacing: 2px;
+            background: rgba(245, 240, 232, 0.95);
+            border-radius: 14px;
+            padding: 10px 20px;
+            display: inline-block;
+            margin: 6px 0 10px;
+            border: 2px dashed #E91E6D;
+            font-family: 'Inter', monospace;
+        }
+
+        .promo-valid {
+            font-size: 12px;
+            color: #8B7355;
+            margin-bottom: 4px;
+            font-weight: 400;
+        }
+        
+        .promo-helper {
+            font-size: 11px;
+            color: #2D2D2D;
+            opacity: 0.5;
+            font-weight: 400;
+        }
+
+        .button-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-top: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .button-large {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            border-radius: 100px;
+            padding: 17px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            border: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .btn-primary {
+            background: #2D2D2D;
+            color: #F5F0E8;
+            box-shadow: 0 4px 14px rgba(45, 45, 45, 0.25);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+            background: #1a1a1a;
+        }
+
+        .btn-secondary {
+            background: rgba(245, 240, 232, 0.85);
+            color: #2D2D2D;
+            border: 1.5px solid rgba(45, 45, 45, 0.2);
+            backdrop-filter: blur(4px);
+            font-weight: 500;
+        }
+
+        .btn-secondary:active {
+            background: #F5F0E8;
+            border-color: #E91E6D;
+            transform: scale(0.97);
+        }
+
+        .btn-helper {
+            font-size: 11px;
+            color: #8B7355;
+            text-align: center;
+            margin-top: -3px;
+            opacity: 0.85;
+            font-weight: 400;
+            line-height: 1.3;
+        }
+
+        .section-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #2D2D2D;
+            text-align: center;
+            margin-bottom: 12px;
+            opacity: 0.8;
+            letter-spacing: 0.3px;
+        }
+
+        .final-caption {
+            font-size: 10px;
+            color: #8B7355;
+            text-align: center;
+            margin-top: 20px;
+            line-height: 1.5;
+            opacity: 0.7;
+            max-width: 270px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 12px;
+        }
+
+        .centered {
+            text-align: center;
+            align-items: center;
+        }
+
+        .story-container {
+            background: rgba(245, 240, 232, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 28px 18px 36px;
+            margin: 0 0 10px;
+            border: 1px solid rgba(45, 45, 45, 0.12);
+            box-shadow: 0 20px 40px -18px rgba(45, 45, 45, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .story-top-text {
+            font-size: 12px;
+            font-weight: 500;
+            color: #8B7355;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .story-headline {
+            font-size: 36px;
+            font-weight: 600;
+            color: #2D2D2D;
+            line-height: 1.1;
+            margin: 6px 0 4px;
+        }
+
+        .story-subhead {
+            font-size: 16px;
+            font-weight: 400;
+            color: #8B7355;
+            max-width: 260px;
+            margin: 0 auto 14px;
+            line-height: 1.4;
+        }
+
+        .story-footer {
+            font-size: 12px;
+            color: #2D2D2D;
+            margin-top: 24px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            opacity: 0.7;
+        }
+
+        .confirmation-icon {
+            font-size: 48px;
+            margin-bottom: 6px;
+            filter: drop-shadow(0 4px 8px rgba(233, 30, 109, 0.2));
+        }
+
+        .fade-in {
+            animation: softAppear 0.35s ease-out;
+        }
+
+        @keyframes softAppear {
+            0% { opacity: 0.5; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bubbleUp {
+            0%,80%,100% { transform: scale(0.6); opacity: 0.2; }
+            40% { transform: scale(1.1); opacity: 0.7; }
+        }
+
+        .hidden-nav {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 14px;
+            z-index: 2;
+        }
+        .dot {
+            width: 5px;
+            height: 5px;
+            background: #8B7355;
+            opacity: 0.35;
+            border-radius: 10px;
+        }
+
+        .option-with-desc {
+            cursor: pointer;
+            transition: transform 0.12s, background 0.12s;
+        }
+        .option-with-desc:active {
+            transform: scale(0.98);
+            background: rgba(245, 240, 232, 0.95);
+        }
+
+        #storyCardContainer {
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            width: 1080px;
+            height: 1920px;
+            background: #F5F0E8;
+            z-index: 9999;
+        }
+
+        .story-card {
+            width: 1080px;
+            height: 1920px;
+            background: linear-gradient(180deg, #F5F0E8 0%, #EBE5DC 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 80px 60px;
+            position: relative;
+        }
+
+        .story-card-logo {
+            font-size: 48px;
+            font-weight: 700;
+            color: #2D2D2D;
+            margin-bottom: 60px;
+            letter-spacing: 2px;
+        }
+
+        .story-card-logo span {
+            color: #E91E6D;
+        }
+
+        .story-card-image {
+            width: 720px;
+            height: 960px;
+            border-radius: 360px 360px 180px 180px;
+            overflow: hidden;
+            margin-bottom: 60px;
+            box-shadow: 0 40px 100px -30px rgba(45, 45, 45, 0.3);
+            border: 3px solid rgba(45, 45, 45, 0.08);
+        }
+
+        .story-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .story-card-title {
+            font-size: 72px;
+            font-weight: 700;
+            color: #2D2D2D;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .story-card-subtitle {
+            font-size: 32px;
+            font-weight: 400;
+            color: #8B7355;
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.4;
+            margin-bottom: 60px;
+        }
+
+        .story-card-promo {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 50px 60px;
+            border: 3px dashed #E91E6D;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .story-card-promo-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #2D2D2D;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 25px;
+            opacity: 0.7;
+        }
+
+        .story-card-promo-code {
+            font-size: 90px;
+            font-weight: 700;
+            color: #E91E6D;
+            letter-spacing: 5px;
+            font-family: 'Inter', monospace;
+        }
+
+        .story-card-promo-valid {
+            font-size: 28px;
+            color: #8B7355;
+            margin-top: 20px;
+            font-weight: 400;
+        }
+
+        .story-card-footer {
+            font-size: 28px;
+            color: #2D2D2D;
+            opacity: 0.5;
+            margin-top: auto;
+            font-weight: 400;
+        }
+
+        .story-card-brand {
+            position: absolute;
+            bottom: 60px;
+            font-size: 32px;
+            font-weight: 500;
+            color: #8B7355;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-screen" id="appScreen">
+        <div class="brand-logo">
+            <img src="<%= asset_path('cocktails/logo.png') %>" alt="НАПИ:БАР" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="brand-logo-text" style="display: none;">НАПИ:<span>БАР</span></div>
+        </div>
+
+        <!-- СЦЕНА 1: ВХОД -->
+        <div class="scene active centered" id="scene1">
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <h1 class="headline-large">Весна начинается с тебя</h1>
+                <p class="subhead">А с того, какой ты сегодня</p>
+                <div style="margin: 40px 0 20px; width: 100%;">
+                    <button class="button-large btn-primary" id="btnStart">Узнать свой вкус</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- СЦЕНА 2: ВОПРОС 1 - Настроение -->
+        <div class="scene centered" id="scene2">
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <h2 class="headline-medium">Твоя среда — какая она?</h2>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px; width: 100%;">
+                    <button class="button-large btn-secondary btn-q2" data-type="party">Как маленькая пятница — хочу праздника 🎉</button>
+                    <button class="button-large btn-secondary btn-q2" data-type="calm">Тихая гавань — нужен покой 🌿</button>
+                    <button class="button-large btn-secondary btn-q2" data-type="surprise">День сюрпризов — жду неожиданностей ✨</button>
+                    <button class="button-large btn-secondary btn-q2" data-type="light">Лёгкий бриз — хочу свободы 🍃</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- СЦЕНА 3: ВОПРОС 2 - Вкус -->
+        <div class="scene centered" id="scene3">
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <h2 class="headline-medium">Какой вкус тебе ближе сейчас?</h2>
+                <div class="option-stack" style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px; width: 100%;">
+                    <div class="option-with-desc" data-type="berry" style="background: rgba(245, 240, 232, 0.75); backdrop-filter: blur(4px); border-radius: 24px; padding: 18px 22px; border: 1px solid rgba(45, 45, 45, 0.12);">
+                        <p style="font-size:17px; color:#2D2D2D; font-weight: 500; margin-bottom: 4px;">Ягодная свежесть</p>
+                        <p class="micro-text">сладость с лёгкой терпкостью</p>
+                    </div>
+                    <div class="option-with-desc" data-type="citrus" style="background: rgba(245, 240, 232, 0.75); backdrop-filter: blur(4px); border-radius: 24px; padding: 18px 22px; border: 1px solid rgba(45, 45, 45, 0.12);">
+                        <p style="font-size:17px; color:#2D2D2D; font-weight: 500; margin-bottom: 4px;">Цитрус и кофе</p>
+                        <p class="micro-text">сладкий, мягкий, согревающий</p>
+                    </div>
+                    <div class="option-with-desc" data-type="herb" style="background: rgba(245, 240, 232, 0.75); backdrop-filter: blur(4px); border-radius: 24px; padding: 18px 22px; border: 1px solid rgba(45, 45, 45, 0.12);">
+                        <p style="font-size:17px; color:#2D2D2D; font-weight: 500; margin-bottom: 4px;">Травы и яблоко</p>
+                        <p class="micro-text">свежий, с мягкой кислинкой</p>
+                    </div>
+                    <div class="option-with-desc" data-type="pepper" style="background: rgba(245, 240, 232, 0.75); backdrop-filter: blur(4px); border-radius: 24px; padding: 18px 22px; border: 1px solid rgba(45, 45, 45, 0.12);">
+                        <p style="font-size:17px; color:#2D2D2D; font-weight: 500; margin-bottom: 4px;">Клубника и перец</p>
+                        <p class="micro-text">яркий, кислый, неожиданный</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- СЦЕНА 4: ВОПРОС 3 - Атмосфера -->
+        <div class="scene centered" id="scene4">
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <h2 class="headline-medium">Что для тебя идеальный вечер?</h2>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px; width: 100%;">
+                    <button class="button-large btn-secondary btn-q4" data-type="party">Весёлый и шумный 🎉</button>
+                    <button class="button-large btn-secondary btn-q4" data-type="calm">Спокойный и уютный 🕯️</button>
+                    <button class="button-large btn-secondary btn-q4" data-type="surprise">С неожиданностями 🎲</button>
+                    <button class="button-large btn-secondary btn-q4" data-type="light">Лёгкий и непринуждённый 🍃</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- СЦЕНА 5: ЗАГРУЗКА -->
+        <div class="scene centered" id="scene5">
+            <div style="flex:1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <h2 class="headline-medium" style="margin-bottom: 32px;">Подбираем твой коктейль...</h2>
+                <div style="display: flex; gap: 16px; justify-content: center; margin: 30px 0;">
+                    <div style="width:14px; height:14px; background:#E91E6D; border-radius:50%; animation: bubbleUp 1.4s infinite both; animation-delay:-0.3s;"></div>
+                    <div style="width:14px; height:14px; background:#8B7355; border-radius:50%; animation: bubbleUp 1.4s infinite both; animation-delay:-0.1s;"></div>
+                    <div style="width:14px; height:14px; background:#2D2D2D; border-radius:50%; animation: bubbleUp 1.4s infinite both; animation-delay:0.1s;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- СЦЕНА 6: РЕЗУЛЬТАТ -->
+        <div class="scene centered" id="scene6">
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; width: 100%;">
+                <div class="cocktail-image-large" id="resultImage"></div>
+                
+                <h1 class="headline-large" id="resultTitle">Твой коктейль</h1>
+                <p class="subhead" id="resultDesc">Описание коктейля</p>
+                
+                <div class="section-divider"></div>
+                
+                <div class="bonus-card">
+                    <div class="bonus-title">Весенний бонус</div>
+                    <div class="promo-code">SPRINGNAPI</div>
+                    <div class="promo-valid">Действует до 31 марта</div>
+                    <div class="promo-helper">Покажи этот экран в баре</div>
+                </div>
+
+                <div class="button-container">
+                    <div class="section-label">Поделиться результатом</div>
+                    
+                    <div class="button-group">
+                        <button class="button-large btn-primary" id="shareResultBtn">
+                            Поделиться в Telegram
+                        </button>
+                        <div class="btn-helper">Отправить ссылку другу или в чат</div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="button-large btn-secondary" id="downloadCardBtn">
+                            Скачать для Stories (16:9)
+                        </button>
+                        <div class="btn-helper">PDF для публикации в любой соцсети</div>
+                    </div>
+                </div>
+
+                <p class="final-caption">
+                    Скачай карточку в формате 16:9 и опубликуй в Stories Telegram, Instagram или других соцсетях
+                </p>
+            </div>
+        </div>
+
+        <!-- СЦЕНА 7: ПОДТВЕРЖДЕНИЕ -->
+        <div class="scene centered" id="scene7">
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <div class="story-container">
+                    <div class="story-top-text">НАПИ:БАР — Весенний квиз</div>
+                    <div class="cocktail-story-image" id="storyImage"></div>
+                    <div class="story-headline" id="storyTitle">Твой коктейль</div>
+                    <div class="story-subhead" id="storyDesc">Описание</div>
+                    <div class="story-footer">Узнай, кто ты этой весной</div>
+                </div>
+                
+                <div style="margin-top: 18px; width: 100%;">
+                    <div class="confirmation-icon">📋✨</div>
+                    <h2 class="headline-medium" style="margin-bottom: 4px; font-size: 24px;">Ссылка скопирована</h2>
+                    <p class="subhead" style="max-width: 250px; margin: 0 auto 16px;">Отправь другу и узнайте, кто вы этой весной</p>
+                    <button class="button-large btn-secondary" style="max-width: 190px; margin: 12px auto;" id="backToResultBtn">Вернуться</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden-nav">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+    </div>
+
+    <!-- Story Card Container for PDF Generation -->
+    <div id="storyCardContainer">
+        <div class="story-card" id="storyCard">
+            <div class="story-card-logo">НАПИ:<span>БАР</span></div>
+            
+            <div class="story-card-image">
+                <img id="storyCardImg" src="" alt="Cocktail">
+            </div>
+            
+            <div class="story-card-title" id="storyCardTitle">Твой коктейль</div>
+            <div class="story-card-subtitle" id="storyCardDesc">Описание</div>
+            
+            <div class="story-card-promo">
+                <div class="story-card-promo-title">Весенний бонус</div>
+                <div class="story-card-promo-code">SPRINGNAPI</div>
+                <div class="story-card-promo-valid">Действует до 31 марта</div>
+            </div>
+            
+            <div class="story-card-footer">НАПИ:БАР — Весенний квиз 2025</div>
+            <div class="story-card-brand">napibar.ru</div>
+        </div>
+    </div>
+
+    <script>
+        // Коктейльное меню из бара
+        const cocktailResults = {
+            cocktail68: {
+                name: 'Клубничный Имбирь #68',
+                desc: 'Свежий ягодный коктейль с лёгкой пряностью и ароматом зелени',
+                image: '<%= asset_path('cocktails/cocktail68.png') %>',
+                types: ['berry', 'party', 'light']
+            },
+            cocktail69: {
+                name: 'Апельсин Кофе #69',
+                desc: 'Свежий, лёгкий сладкий коктейль с апельсиново-кофейным вкусом',
+                image: '<%= asset_path('cocktails/cocktail69.png') %>',
+                types: ['citrus', 'calm', 'surprise']
+            },
+            cocktail70: {
+                name: 'Яблоко Травы #70',
+                desc: 'Свежий травянистый коктейль с мягким яблочным послевкусием и приятной кислинкой',
+                image: '<%= asset_path('cocktails/cocktail70.png') %>',
+                types: ['herb', 'calm', 'light']
+            },
+            cocktail71: {
+                name: 'Клубника Перец #71',
+                desc: 'Свежий, кислый, лёгкий коктейль с ярким вкусом клубники, болгарского перца и приятной кислинкой',
+                image: '<%= asset_path('cocktails/cocktail71.png') %>',
+                types: ['pepper', 'party', 'surprise']
+            },
+            shot1: {
+                name: 'Кофе-Апельсин Шот',
+                desc: 'Крепкий сладкий шот',
+                image: '<%= asset_path('cocktails/shot1.png') %>',
+                types: ['citrus', 'party', 'surprise']
+            },
+            shot2: {
+                name: 'Тирамису Шот',
+                desc: 'Лёгкий, сливочный десертный шот',
+                image: '<%= asset_path('cocktails/shot2.png') %>',
+                types: ['citrus', 'calm', 'light']
+            },
+            shot3: {
+                name: 'Лимонно-Травяной Шот',
+                desc: 'Крепкий, пряный шот с приятной кислинкой',
+                image: '<%= asset_path('cocktails/shot3.png') %>',
+                types: ['herb', 'party', 'surprise']
+            },
+            shot4: {
+                name: 'Апельсин Шот',
+                desc: 'Лёгкий цитрусовый шот',
+                image: '<%= asset_path('cocktails/shot4.png') %>',
+                types: ['citrus', 'light', 'party']
+            }
+        };
+
+        let userAnswers = {
+            q1: null,
+            q2: null,
+            q3: null
+        };
+
+        function calculateResult() {
+            const answers = [userAnswers.q1, userAnswers.q2, userAnswers.q3];
+            const typeCount = {};
+            
+            answers.forEach(type => {
+                if (type) {
+                    typeCount[type] = (typeCount[type] || 0) + 1;
+                }
+            });
+
+            let bestMatch = null;
+            let bestScore = 0;
+
+            for (const [key, cocktail] of Object.entries(cocktailResults)) {
+                let score = 0;
+                cocktail.types.forEach(type => {
+                    if (typeCount[type]) {
+                        score += typeCount[type] * 2;
+                    }
+                });
+
+                // Добавляем случайность чтобы не всегда было одинаково
+                score += Math.random() * 1.5;
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMatch = cocktail;
+                }
+            }
+
+            if (!bestMatch || bestScore === 0) {
+                const keys = Object.keys(cocktailResults);
+                bestMatch = cocktailResults[keys[Math.floor(Math.random() * keys.length)]];
+            }
+
+            return bestMatch;
+        }
+
+        function updateResultUI(cocktail) {
+            document.getElementById('resultTitle').textContent = `Ты — ${cocktail.name}`;
+            document.getElementById('resultDesc').textContent = cocktail.desc;
+            document.getElementById('storyTitle').textContent = `Ты — ${cocktail.name}`;
+            document.getElementById('storyDesc').textContent = cocktail.desc;
+            document.getElementById('storyCardTitle').textContent = `Ты — ${cocktail.name}`;
+            document.getElementById('storyCardDesc').textContent = cocktail.desc;
+            document.getElementById('storyCardImg').src = cocktail.image;
+
+            // Установка изображений
+            const resultImage = document.getElementById('resultImage');
+            const storyImage = document.getElementById('storyImage');
+            
+            resultImage.style.backgroundImage = `url('${cocktail.image}')`;
+            storyImage.style.backgroundImage = `url('${cocktail.image}')`;
+        }
+
+        (function() {
+            const scenes = {
+                1: document.getElementById('scene1'),
+                2: document.getElementById('scene2'),
+                3: document.getElementById('scene3'),
+                4: document.getElementById('scene4'),
+                5: document.getElementById('scene5'),
+                6: document.getElementById('scene6'),
+                7: document.getElementById('scene7')
+            };
+
+            function showScene(sceneId) {
+                Object.values(scenes).forEach(s => s.classList.remove('active'));
+                const next = scenes[sceneId];
+                if (next) {
+                    next.classList.add('active');
+                    next.classList.add('fade-in');
+                    setTimeout(() => next.classList.remove('fade-in'), 350);
+                }
+                if (sceneId === 5) {
+                    if (window.loadingTimer) clearTimeout(window.loadingTimer);
+                    window.loadingTimer = setTimeout(() => {
+                        if (scenes[5].classList.contains('active')) {
+                            const result = calculateResult();
+                            updateResultUI(result);
+                            showScene(6);
+                        }
+                    }, 2000);
+                }
+            }
+            window.showScene = showScene;
+
+            document.getElementById('btnStart').addEventListener('click', () => {
+                userAnswers = { q1: null, q2: null, q3: null };
+                showScene(2);
+            });
+
+            document.querySelectorAll('#scene2 .btn-q2').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    userAnswers.q1 = this.getAttribute('data-type');
+                    showScene(3);
+                });
+            });
+
+            document.querySelectorAll('#scene3 .option-with-desc').forEach(opt => {
+                opt.addEventListener('click', function() {
+                    userAnswers.q2 = this.getAttribute('data-type');
+                    showScene(4);
+                });
+            });
+
+            document.querySelectorAll('#scene4 .btn-q4').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    userAnswers.q3 = this.getAttribute('data-type');
+                    showScene(5);
+                });
+            });
+
+            document.getElementById('shareResultBtn').addEventListener('click', async () => {
+                try {
+                    const resultName = document.getElementById('resultTitle').textContent.replace('Ты — ', '');
+                    await navigator.clipboard.writeText(`https://napibar.ru/quiz/result/${resultName.toLowerCase().replace(' ', '-')}`);
+                    showScene(7);
+                } catch (err) {
+                    alert('Ссылка скопирована!');
+                    showScene(7);
+                }
+            });
+
+            document.getElementById('downloadCardBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('downloadCardBtn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Генерация PDF...';
+                btn.disabled = true;
+
+                try {
+                    const storyCard = document.getElementById('storyCard');
+                    
+                    const canvas = await html2canvas(storyCard, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#F5F0E8'
+                    });
+
+                    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                    
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'px',
+                        format: [1080, 1920]
+                    });
+
+                    pdf.addImage(imgData, 'JPEG', 0, 0, 1080, 1920);
+                    pdf.save('NAPI-BAR-Result.pdf');
+
+                    btn.textContent = '✓ Скачано!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                    }, 2000);
+
+                } catch (error) {
+                    console.error('PDF generation error:', error);
+                    alert('Не удалось создать PDF. Попробуйте сделать скриншот.');
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            });
+
+            document.getElementById('backToResultBtn').addEventListener('click', () => {
+                showScene(6);
+            });
+
+            const cocktailImg = document.querySelector('.cocktail-image-large');
+            if (cocktailImg) {
+                let clickCount = 0;
+                cocktailImg.addEventListener('click', () => {
+                    clickCount++;
+                    if (clickCount === 3) {
+                        showScene(1);
+                        clickCount = 0;
+                    }
+                    setTimeout(() => clickCount = 0, 700);
+                });
+            }
+
+            document.querySelector('.brand-logo img').addEventListener('error', function() {
+                this.style.display = 'none';
+                this.nextElementSibling.style.display = 'flex';
+            });
+
+            // Инициализация Telegram Web App
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                tg.ready();
+                tg.expand();
+                
+                // Настройка цветов темы
+                tg.setHeaderColor('#F5F0E8');
+                tg.setBackgroundColor('#F5F0E8');
+                
+                // Можно использовать данные пользователя
+                const user = tg.initDataUnsafe?.user;
+                if (user) {
+                    console.log('Telegram user:', user);
+                    // Можно сохранить данные пользователя для использования в квизе
+                }
+                
+                // Включить закрытие по кнопке назад
+                tg.enableClosingConfirmation();
+            }
+
+            showScene(1);
+        })();
+    </script>
+</body>
+</html>
+
