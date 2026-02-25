@@ -15,9 +15,17 @@ Write-Host "Webhook URL: $WEBHOOK_URL" -ForegroundColor Yellow
 Write-Host ""
 
 try {
-    $response = Invoke-RestMethod -Uri "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook" -Method Post -ContentType "multipart/form-data" -Body @{
-        url = $WEBHOOK_URL
-    }
+    $boundary = [System.Guid]::NewGuid().ToString()
+    $bodyLines = @(
+        "--$boundary",
+        "Content-Disposition: form-data; name=`"url`"",
+        "",
+        $WEBHOOK_URL,
+        "--$boundary--"
+    )
+    $body = $bodyLines -join "`r`n"
+    
+    $response = Invoke-RestMethod -Uri "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook" -Method Post -ContentType "multipart/form-data; boundary=$boundary" -Body $body
     
     Write-Host "Ответ от Telegram API:" -ForegroundColor Cyan
     $response | ConvertTo-Json -Depth 10
