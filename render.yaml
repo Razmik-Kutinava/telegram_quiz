@@ -1,11 +1,11 @@
 services:
   - type: web
     name: telegram-quiz
-    env: ruby
+    runtime: docker
     region: frankfurt
     plan: starter
-    buildCommand: bundle install && bundle exec rails assets:precompile
-    startCommand: bundle exec rails server -p $PORT -e production
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
       - key: RAILS_ENV
         value: production
@@ -19,6 +19,4 @@ services:
         value: true
       - key: RAILS_SERVE_STATIC_FILES
         value: true
-      - key: PORT
-        value: 3000
     healthCheckPath: /up
