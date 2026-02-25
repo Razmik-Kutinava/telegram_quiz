@@ -16,37 +16,8 @@ class TelegramWebhookController < ApplicationController
       # Обработка команд
       case text
       when '/start'
-        # Создаем или находим пользователя
-        if message[:from]
-          user_data = {
-            id: message[:from][:id] || message[:from]['id'],
-            username: message[:from][:username] || message[:from]['username'],
-            first_name: message[:from][:first_name] || message[:from]['first_name'],
-            last_name: message[:from][:last_name] || message[:from]['last_name'],
-            language_code: (message[:from][:language_code] || message[:from]['language_code'] || 'ru')
-          }
-          
-          begin
-            User.find_or_create_from_telegram(user_data)
-          rescue => e
-            Rails.logger.error "Error creating user: #{e.message}"
-            Rails.logger.error e.backtrace.join("\n")
-          end
-        end
-        
-        web_app_url = ENV['TELEGRAM_WEB_APP_URL']
-        
-        unless web_app_url.present?
-          Rails.logger.error "TELEGRAM_WEB_APP_URL не установлен! Установите переменную окружения."
-          send_message(chat_id, "⚠️ Приложение временно недоступно. Пожалуйста, попробуйте позже.")
-          return
-        end
-        
-        send_message_with_button(chat_id, 
-          "Добро пожаловать в квиз НАПИ:БАР! 🍹\n\nНажмите на кнопку ниже, чтобы начать квиз и узнать свой идеальный коктейль.",
-          "Открыть квиз",
-          web_app_url
-        )
+        # Простое тестовое сообщение
+        send_message(chat_id, "Привет! Это тестовое сообщение от бота 🍹")
       else
         # Можно добавить другую логику
       end
