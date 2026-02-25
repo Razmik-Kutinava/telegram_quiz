@@ -6,62 +6,64 @@ class TelegramWebhookController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:webhook]
   
   def webhook
-    # Логируем что пришло
+    # Логируем что пришло - ВСЕГДА
     Rails.logger.info "=== WEBHOOK CALLED ==="
-    Rails.logger.info "Params: #{params.inspect}"
-    Rails.logger.info "Request content type: #{request.content_type}"
+    Rails.logger.info "Method: #{request.method}"
+    Rails.logger.info "Content-Type: #{request.content_type}"
+    Rails.logger.info "Params keys: #{params.keys.inspect}"
     
-    # Читаем body один раз
-    request.body.rewind
-    body_content = request.body.read
-    Rails.logger.info "Request body: #{body_content.inspect}"
-    
-    # Пробуем получить данные из params (Rails может автоматически парсить JSON)
-    # или из request.body
-    data = params.to_unsafe_h
-    
-    # Если в params нет данных, пробуем парсить body
-    if data.empty? || (!data['message'] && !data[:message] && !data['callback_query'] && !data[:callback_query])
-      begin
-        Rails.logger.info "Parsing body: #{body_content}"
+    begin
+      # Rails автоматически парсит JSON в params, если Content-Type правильный
+      # Но также пробуем прочитать body напрямую
+      data = nil
+      
+      # Вариант 1: Данные уже в params (Rails автоматически распарсил)
+      if params[:message] || params['message'] || params[:callback_query] || params['callback_query']
+        Rails.logger.info "Data found in params"
+        data = params.to_unsafe_h
+      else
+        # Вариант 2: Читаем body и парсим вручную
+        Rails.logger.info "Reading from request body"
+        request.body.rewind
+        body_content = request.body.read
+        Rails.logger.info "Body length: #{body_content.length}"
+        
         if body_content.present?
           data = JSON.parse(body_content)
           data = data.with_indifferent_access if data.is_a?(Hash)
         end
-      rescue => e
-        Rails.logger.error "Error parsing webhook data: #{e.message}"
-        Rails.logger.error e.backtrace.join("\n")
-        return head :ok # Все равно возвращаем 200, чтобы Telegram не повторял запрос
       end
-    end
-    
-    Rails.logger.info "Parsed data: #{data.inspect}"
-    
-    # Получаем message или callback_query
-    message = data[:message] || data['message']
-    callback_query = data[:callback_query] || data['callback_query']
-    
-    if message
-      chat = message[:chat] || message['chat'] || {}
-      chat_id = chat[:id] || chat['id']
-      text = message[:text] || message['text']
       
-      Rails.logger.info "Message: chat_id=#{chat_id}, text=#{text.inspect}"
+      Rails.logger.info "Data keys: #{data&.keys&.inspect}"
       
-      if text == '/start'
-        Rails.logger.info "Processing /start command for chat_id=#{chat_id}"
-        send_message(chat_id, "Привет! Это тестовое сообщение от бота 🍹")
+      # Получаем message или callback_query
+      message = data&.[](:message) || data&.[]('message')
+      callback_query = data&.[](:callback_query) || data&.[]('callback_query')
+      
+      if message
+        chat = message[:chat] || message['chat'] || {}
+        chat_id = chat[:id] || chat['id']
+        text = message[:text] || message['text']
+        
+        Rails.logger.info "Message received - chat_id: #{chat_id}, text: #{text.inspect}"
+        
+        if text == '/start'
+          Rails.logger.info "Processing /start command"
+          send_message(chat_id, "Привет! Это тестовое сообщение от бота 🍹")
+        end
+      elsif callback_query
+        Rails.logger.info "Callback query received"
+        callback_id = callback_query[:id] || callback_query['id']
+        answer_callback_query(callback_id) if callback_id
       else
-        Rails.logger.info "Unknown command: #{text}"
+        Rails.logger.warn "No message or callback_query. Full data: #{data.inspect}"
       end
-    elsif callback_query
-      Rails.logger.info "Callback query received"
-      callback_id = callback_query[:id] || callback_query['id']
-      answer_callback_query(callback_id) if callback_id
-    else
-      Rails.logger.warn "No message or callback_query found. Data keys: #{data.keys.inspect}"
+    rescue => e
+      Rails.logger.error "EXCEPTION in webhook: #{e.class} - #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
     end
     
+    # ВСЕГДА возвращаем 200, чтобы Telegram не повторял запрос
     head :ok
   end
   
