@@ -34,10 +34,18 @@ class TelegramWebhookController < ApplicationController
           end
         end
         
+        web_app_url = ENV['TELEGRAM_WEB_APP_URL']
+        
+        unless web_app_url.present?
+          Rails.logger.error "TELEGRAM_WEB_APP_URL не установлен! Установите переменную окружения."
+          send_message(chat_id, "⚠️ Приложение временно недоступно. Пожалуйста, попробуйте позже.")
+          return
+        end
+        
         send_message_with_button(chat_id, 
           "Добро пожаловать в квиз НАПИ:БАР! 🍹\n\nНажмите на кнопку ниже, чтобы начать квиз и узнать свой идеальный коктейль.",
           "Открыть квиз",
-          ENV['TELEGRAM_WEB_APP_URL'] || "https://scutiform-pushed-malorie.ngrok-free.dev"
+          web_app_url
         )
       else
         # Можно добавить другую логику
