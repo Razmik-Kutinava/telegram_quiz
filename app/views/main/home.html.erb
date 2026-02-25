@@ -35,17 +35,18 @@
         .app-screen {
             max-width: 390px;
             width: 100%;
-            background: rgba(245, 240, 232, 0.9);
+            background: rgba(245, 240, 232, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: 32px;
             box-shadow: 0 30px 50px -20px rgba(45, 45, 45, 0.25);
-            padding: 28px 20px 36px;
+            padding: 24px 20px 28px;
             position: relative;
             overflow: hidden;
             transition: opacity 0.25s ease;
             border: 1px solid rgba(45, 45, 45, 0.08);
             min-height: 800px;
+            max-height: 844px;
             display: flex;
             flex-direction: column;
         }
@@ -53,12 +54,13 @@
         .scene {
             display: none;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
             position: relative;
             z-index: 2;
             flex: 1;
             justify-content: center;
             width: 100%;
+            height: 100%;
         }
 
         .scene.active {
@@ -72,32 +74,30 @@
         }
 
         .headline-large {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 600;
             color: #2D2D2D;
-            line-height: 1.15;
+            line-height: 1.2;
             text-align: center;
-            margin-bottom: 8px;
         }
 
         .headline-medium {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 500;
             color: #2D2D2D;
             text-align: center;
         }
 
         .subhead {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 400;
             color: #8B7355;
-            margin-bottom: 6px;
             text-align: center;
             line-height: 1.5;
         }
 
         .micro-text {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 400;
             color: #8B7355;
             opacity: 0.85;
@@ -110,32 +110,21 @@
             top: 20px;
             left: 24px;
             z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .brand-logo img {
-            height: 32px;
-            width: auto;
-        }
-
-        .brand-logo-text {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             color: #2D2D2D;
             letter-spacing: 0.5px;
         }
 
-        .brand-logo-text span {
+        .brand-logo span {
             color: #E91E6D;
         }
 
         .cocktail-image-large {
             width: 100%;
-            max-width: 240px;
+            max-width: 220px;
             aspect-ratio: 3/4;
-            margin: 8px auto 20px;
+            margin: 8px auto 16px;
             border-radius: 120px 120px 50px 50px;
             box-shadow: 0 20px 40px -15px rgba(45, 45, 45, 0.2);
             position: relative;
@@ -164,54 +153,53 @@
             width: 100%;
             height: 1px;
             background: linear-gradient(90deg, transparent, rgba(45, 45, 45, 0.15), transparent);
-            margin: 20px 0;
+            margin: 16px 0;
         }
 
         .bonus-card {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 22px 18px;
-            border: 1px solid rgba(45, 45, 45, 0.1);
-            box-shadow: 0 8px 24px -12px rgba(45, 45, 45, 0.12);
+            border-radius: 16px;
+            padding: 16px 18px;
+            border: 1px solid rgba(45, 45, 45, 0.08);
+            box-shadow: 0 6px 18px -10px rgba(45, 45, 45, 0.1);
             width: 100%;
             text-align: center;
-            margin-bottom: 8px;
         }
 
         .bonus-title {
-            font-size: 13px;
+            font-size: 10px;
             font-weight: 600;
             color: #2D2D2D;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            opacity: 0.7;
+            letter-spacing: 1px;
+            opacity: 0.6;
         }
 
         .promo-code {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
             color: #E91E6D;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             background: rgba(245, 240, 232, 0.95);
-            border-radius: 14px;
-            padding: 10px 20px;
+            border-radius: 10px;
+            padding: 8px 16px;
             display: inline-block;
-            margin: 6px 0 10px;
-            border: 2px dashed #E91E6D;
+            margin: 4px 0 6px;
+            border: 1.5px dashed #E91E6D;
             font-family: 'Inter', monospace;
         }
 
         .promo-valid {
-            font-size: 12px;
+            font-size: 10px;
             color: #8B7355;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             font-weight: 400;
         }
         
         .promo-helper {
-            font-size: 11px;
+            font-size: 9px;
             color: #2D2D2D;
             opacity: 0.5;
             font-weight: 400;
@@ -221,14 +209,13 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 18px;
-            margin-top: 8px;
+            gap: 12px;
+            margin-top: 4px;
         }
 
-        .button-group {
+        .button-row {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
+            gap: 10px;
             width: 100%;
         }
 
@@ -238,8 +225,8 @@
             justify-content: center;
             width: 100%;
             border-radius: 100px;
-            padding: 17px 24px;
-            font-size: 16px;
+            padding: 14px 18px;
+            font-size: 14px;
             font-weight: 500;
             text-align: center;
             transition: all 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.1);
@@ -252,6 +239,7 @@
             background: #2D2D2D;
             color: #F5F0E8;
             box-shadow: 0 4px 14px rgba(45, 45, 45, 0.25);
+            flex: 1.2;
         }
 
         .btn-primary:active {
@@ -262,9 +250,10 @@
         .btn-secondary {
             background: rgba(245, 240, 232, 0.85);
             color: #2D2D2D;
-            border: 1.5px solid rgba(45, 45, 45, 0.2);
+            border: 1.5px solid rgba(45, 45, 45, 0.15);
             backdrop-filter: blur(4px);
             font-weight: 500;
+            flex: 1;
         }
 
         .btn-secondary:active {
@@ -274,36 +263,13 @@
         }
 
         .btn-helper {
-            font-size: 11px;
+            font-size: 9px;
             color: #8B7355;
             text-align: center;
-            margin-top: -3px;
-            opacity: 0.85;
-            font-weight: 400;
-            line-height: 1.3;
-        }
-
-        .section-label {
-            font-size: 13px;
-            font-weight: 500;
-            color: #2D2D2D;
-            text-align: center;
-            margin-bottom: 12px;
+            margin-top: -2px;
             opacity: 0.8;
-            letter-spacing: 0.3px;
-        }
-
-        .final-caption {
-            font-size: 10px;
-            color: #8B7355;
-            text-align: center;
-            margin-top: 20px;
-            line-height: 1.5;
-            opacity: 0.7;
-            max-width: 270px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 0 12px;
+            font-weight: 400;
+            line-height: 1.2;
         }
 
         .centered {
@@ -523,14 +489,32 @@
             color: #8B7355;
             letter-spacing: 1px;
         }
+
+        /* Avatar Style */
+        .avatar-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50% 50% 40% 40% / 60% 60% 50% 50%;
+            border: 2px solid rgba(45, 45, 45, 0.1);
+            background: rgba(245, 240, 232, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 50% 50% 40% 40% / 60% 60% 50% 50%;
+        }
     </style>
 </head>
 <body>
     <div class="app-screen" id="appScreen">
-        <div class="brand-logo">
-            <img src="<%= asset_path('cocktails/logo.png') %>" alt="НАПИ:БАР" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div class="brand-logo-text" style="display: none;">НАПИ:<span>БАР</span></div>
-        </div>
+        <div class="brand-logo">НАПИ:<span>БАР</span></div>
 
         <!-- СЦЕНА 1: ВХОД -->
         <div class="scene active centered" id="scene1">
@@ -543,23 +527,23 @@
             </div>
         </div>
 
-        <!-- СЦЕНА 2: ВОПРОС 1 - Настроение -->
+        <!-- СЦЕНА 2: ВОПРОС 1 -->
         <div class="scene centered" id="scene2">
             <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
                 <h2 class="headline-medium">Твоя среда — какая она?</h2>
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px; width: 100%;">
-                    <button class="button-large btn-secondary btn-q2" data-type="party">Как маленькая пятница — хочу праздника 🎉</button>
-                    <button class="button-large btn-secondary btn-q2" data-type="calm">Тихая гавань — нужен покой 🌿</button>
-                    <button class="button-large btn-secondary btn-q2" data-type="surprise">День сюрпризов — жду неожиданностей ✨</button>
-                    <button class="button-large btn-secondary btn-q2" data-type="light">Лёгкий бриз — хочу свободы 🍃</button>
+                    <button class="button-large btn-secondary btn-q2" data-type="party">Как маленькая пятница 🎉</button>
+                    <button class="button-large btn-secondary btn-q2" data-type="calm">Тихая гавань 🌿</button>
+                    <button class="button-large btn-secondary btn-q2" data-type="surprise">День сюрпризов ✨</button>
+                    <button class="button-large btn-secondary btn-q2" data-type="light">Лёгкий бриз 🍃</button>
                 </div>
             </div>
         </div>
 
-        <!-- СЦЕНА 3: ВОПРОС 2 - Вкус -->
+        <!-- СЦЕНА 3: ВОПРОС 2 -->
         <div class="scene centered" id="scene3">
             <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                <h2 class="headline-medium">Какой вкус тебе ближе сейчас?</h2>
+                <h2 class="headline-medium">Какой вкус тебе ближе?</h2>
                 <div class="option-stack" style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px; width: 100%;">
                     <div class="option-with-desc" data-type="berry" style="background: rgba(245, 240, 232, 0.75); backdrop-filter: blur(4px); border-radius: 24px; padding: 18px 22px; border: 1px solid rgba(45, 45, 45, 0.12);">
                         <p style="font-size:17px; color:#2D2D2D; font-weight: 500; margin-bottom: 4px;">Ягодная свежесть</p>
@@ -581,10 +565,10 @@
             </div>
         </div>
 
-        <!-- СЦЕНА 4: ВОПРОС 3 - Атмосфера -->
+        <!-- СЦЕНА 4: ВОПРОС 3 -->
         <div class="scene centered" id="scene4">
             <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                <h2 class="headline-medium">Что для тебя идеальный вечер?</h2>
+                <h2 class="headline-medium">Идеальный вечер — это:</h2>
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px; width: 100%;">
                     <button class="button-large btn-secondary btn-q4" data-type="party">Весёлый и шумный 🎉</button>
                     <button class="button-large btn-secondary btn-q4" data-type="calm">Спокойный и уютный 🕯️</button>
@@ -597,7 +581,7 @@
         <!-- СЦЕНА 5: ЗАГРУЗКА -->
         <div class="scene centered" id="scene5">
             <div style="flex:1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                <h2 class="headline-medium" style="margin-bottom: 32px;">Подбираем твой коктейль...</h2>
+                <h2 class="headline-medium" style="margin-bottom: 32px;">Подбираем коктейль...</h2>
                 <div style="display: flex; gap: 16px; justify-content: center; margin: 30px 0;">
                     <div style="width:14px; height:14px; background:#E91E6D; border-radius:50%; animation: bubbleUp 1.4s infinite both; animation-delay:-0.3s;"></div>
                     <div style="width:14px; height:14px; background:#8B7355; border-radius:50%; animation: bubbleUp 1.4s infinite both; animation-delay:-0.1s;"></div>
@@ -606,44 +590,43 @@
             </div>
         </div>
 
-        <!-- СЦЕНА 6: РЕЗУЛЬТАТ -->
+        <!-- СЦЕНА 6: РЕЗУЛЬТАТ (FINAL DESIGN) -->
         <div class="scene centered" id="scene6">
-            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; width: 100%;">
-                <div class="cocktail-image-large" id="resultImage"></div>
-                
-                <h1 class="headline-large" id="resultTitle">Твой коктейль</h1>
-                <p class="subhead" id="resultDesc">Описание коктейля</p>
-                
-                <div class="section-divider"></div>
-                
-                <div class="bonus-card">
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; width: 100%; padding-top: 40px;">
+                <!-- Avatar + Result -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                    <div class="avatar-circle" style="margin-bottom: 8px;">
+                        <img id="resultAvatarImage" src="" alt="Avatar" style="display:none; width: 100%; height: 100%; object-fit: cover;">
+                        <span id="resultAvatarPlaceholder" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 32px; color: #2D2D2D; opacity: 0.5;">Cocktail</span>
+                    </div>
+                    
+                    <h1 class="headline-large" id="resultTitle" style="margin-top: 8px;">Ты — Коктейль</h1>
+                    <p class="subhead" id="resultDesc" style="max-width: 280px;">Описание</p>
+                </div>
+
+                <!-- Bonus Card -->
+                <div class="bonus-card" style="margin-bottom: -7px;">
                     <div class="bonus-title">Весенний бонус</div>
-                    <div class="promo-code">SPRINGNAPI</div>
+                    <div class="promo-code" id="promo-code">SPRINGNAPI</div>
                     <div class="promo-valid">Действует до 31 марта</div>
                     <div class="promo-helper">Покажи этот экран в баре</div>
                 </div>
 
-                <div class="button-container">
-                    <div class="section-label">Поделиться результатом</div>
-                    
-                    <div class="button-group">
-                        <button class="button-large btn-primary" id="shareResultBtn">
-                            Поделиться в Telegram
-                        </button>
-                        <div class="btn-helper">Отправить ссылку другу или в чат</div>
-                    </div>
-
-                    <div class="button-group">
+                <!-- Buttons -->
+                <div class="button-container" style="margin-top: 0;">
+                    <div class="button-row">
                         <button class="button-large btn-secondary" id="downloadCardBtn">
                             Скачать для Stories (16:9)
                         </button>
-                        <div class="btn-helper">PDF для публикации в любой соцсети</div>
+                        <button class="button-large btn-primary" id="shareResultBtn">
+                            Поделиться в Telegram
+                        </button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0 8px;">
+                        <div class="btn-helper" style="flex: 1; text-align: left;">PDF с промокодом для Stories</div>
+                        <div class="btn-helper" style="flex: 1; text-align: right;">Поделиться квизом с друзьями</div>
                     </div>
                 </div>
-
-                <p class="final-caption">
-                    Скачай карточку в формате 16:9 и опубликуй в Stories Telegram, Instagram или других соцсетях
-                </p>
             </div>
         </div>
 
@@ -659,8 +642,8 @@
                 </div>
                 
                 <div style="margin-top: 18px; width: 100%;">
-                    <div class="confirmation-icon">📋✨</div>
-                    <h2 class="headline-medium" style="margin-bottom: 4px; font-size: 24px;">Ссылка скопирована</h2>
+                    <div class="confirmation-icon">✨🎉</div>
+                    <h2 class="headline-medium" style="margin-bottom: 4px; font-size: 24px;">Готово!</h2>
                     <p class="subhead" style="max-width: 250px; margin: 0 auto 16px;">Отправь другу и узнайте, кто вы этой весной</p>
                     <button class="button-large btn-secondary" style="max-width: 190px; margin: 12px auto;" id="backToResultBtn">Вернуться</button>
                 </div>
@@ -678,7 +661,11 @@
             <div class="story-card-logo">НАПИ:<span>БАР</span></div>
             
             <div class="story-card-image">
-                <img id="storyCardImg" src="" alt="Cocktail">
+                <img id="storyCardImg" src="" alt="Cocktail" style="display: none;">
+                <div id="storyCardAvatarContainer" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(245, 240, 232, 0.3);">
+                    <img id="storyCardAvatarImg" src="" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                    <span id="storyCardAvatarPlaceholder" style="font-size: 120px; color: #2D2D2D; opacity: 0.3; font-weight: 600;">Cocktail</span>
+                </div>
             </div>
             
             <div class="story-card-title" id="storyCardTitle">Твой коктейль</div>
@@ -686,7 +673,7 @@
             
             <div class="story-card-promo">
                 <div class="story-card-promo-title">Весенний бонус</div>
-                <div class="story-card-promo-code">SPRINGNAPI</div>
+                <div class="story-card-promo-code" id="storyCardPromoCode">SPRINGNAPI</div>
                 <div class="story-card-promo-valid">Действует до 31 марта</div>
             </div>
             
@@ -696,63 +683,60 @@
     </div>
 
     <script>
-        // Коктейльное меню из бара
         const cocktailResults = {
             cocktail68: {
                 name: 'Клубничный Имбирь #68',
-                desc: 'Свежий ягодный коктейль с лёгкой пряностью и ароматом зелени',
-                image: '<%= asset_path('cocktails/cocktail68.png') %>',
+                desc: 'Свежий ягодный коктейль с лёгкой пряностью',
+                image: '<%= safe_asset_path('cocktails/cocktail68.png') %>',
                 types: ['berry', 'party', 'light']
             },
             cocktail69: {
                 name: 'Апельсин Кофе #69',
-                desc: 'Свежий, лёгкий сладкий коктейль с апельсиново-кофейным вкусом',
-                image: '<%= asset_path('cocktails/cocktail69.png') %>',
+                desc: 'Свежий, лёгкий сладкий коктейль',
+                image: '<%= safe_asset_path('cocktails/cocktail69.png') %>',
                 types: ['citrus', 'calm', 'surprise']
             },
             cocktail70: {
                 name: 'Яблоко Травы #70',
-                desc: 'Свежий травянистый коктейль с мягким яблочным послевкусием и приятной кислинкой',
-                image: '<%= asset_path('cocktails/cocktail70.png') %>',
+                desc: 'Свежий травянистый коктейль с яблочным послевкусием',
+                image: '<%= safe_asset_path('cocktails/cocktail70.png') %>',
                 types: ['herb', 'calm', 'light']
             },
             cocktail71: {
                 name: 'Клубника Перец #71',
-                desc: 'Свежий, кислый, лёгкий коктейль с ярким вкусом клубники, болгарского перца и приятной кислинкой',
-                image: '<%= asset_path('cocktails/cocktail71.png') %>',
+                desc: 'Свежий, кислый, лёгкий коктейль',
+                image: '<%= safe_asset_path('cocktails/cocktail71.png') %>',
                 types: ['pepper', 'party', 'surprise']
             },
             shot1: {
                 name: 'Кофе-Апельсин Шот',
                 desc: 'Крепкий сладкий шот',
-                image: '<%= asset_path('cocktails/shot1.png') %>',
+                image: '<%= safe_asset_path('cocktails/shot1.png') %>',
                 types: ['citrus', 'party', 'surprise']
             },
             shot2: {
                 name: 'Тирамису Шот',
                 desc: 'Лёгкий, сливочный десертный шот',
-                image: '<%= asset_path('cocktails/shot2.png') %>',
+                image: '<%= safe_asset_path('cocktails/shot2.png') %>',
                 types: ['citrus', 'calm', 'light']
             },
             shot3: {
                 name: 'Лимонно-Травяной Шот',
-                desc: 'Крепкий, пряный шот с приятной кислинкой',
-                image: '<%= asset_path('cocktails/shot3.png') %>',
+                desc: 'Крепкий, пряный шот с кислинкой',
+                image: '<%= safe_asset_path('cocktails/shot3.png') %>',
                 types: ['herb', 'party', 'surprise']
             },
             shot4: {
                 name: 'Апельсин Шот',
                 desc: 'Лёгкий цитрусовый шот',
-                image: '<%= asset_path('cocktails/shot4.png') %>',
+                image: '<%= safe_asset_path('cocktails/shot4.png') %>',
                 types: ['citrus', 'light', 'party']
             }
         };
 
-        let userAnswers = {
-            q1: null,
-            q2: null,
-            q3: null
-        };
+        let userAnswers = { q1: null, q2: null, q3: null };
+        let quizStartedAt = null;
+        let currentResult = null;
 
         function calculateResult() {
             const answers = [userAnswers.q1, userAnswers.q2, userAnswers.q3];
@@ -774,8 +758,6 @@
                         score += typeCount[type] * 2;
                     }
                 });
-
-                // Добавляем случайность чтобы не всегда было одинаково
                 score += Math.random() * 1.5;
 
                 if (score > bestScore) {
@@ -801,12 +783,131 @@
             document.getElementById('storyCardDesc').textContent = cocktail.desc;
             document.getElementById('storyCardImg').src = cocktail.image;
 
-            // Установка изображений
-            const resultImage = document.getElementById('resultImage');
             const storyImage = document.getElementById('storyImage');
-            
-            resultImage.style.backgroundImage = `url('${cocktail.image}')`;
             storyImage.style.backgroundImage = `url('${cocktail.image}')`;
+            
+            // Обновляем промокод в PDF карточке
+            const promoCode = document.getElementById('storyCardPromoCode');
+            if (promoCode) {
+                promoCode.textContent = 'SPRINGNAPI';
+            }
+            
+            // Обновляем аватар в PDF карточке
+            setTimeout(() => {
+                updateStoryCardAvatar();
+            }, 300);
+            
+            // Сохраняем результат для отправки в БД
+            currentResult = cocktail;
+            
+            // Сохраняем результат в БД
+            saveQuizResult(cocktail);
+        }
+        
+        function updateStoryCardAvatar() {
+            const avatarImg = document.getElementById('resultAvatarImage');
+            const storyCardAvatarImg = document.getElementById('storyCardAvatarImg');
+            const storyCardAvatarPlaceholder = document.getElementById('storyCardAvatarPlaceholder');
+            
+            if (avatarImg && avatarImg.src && avatarImg.style.display !== 'none' && avatarImg.src !== window.location.href) {
+                // Аватар есть - показываем его в PDF
+                if (storyCardAvatarImg) {
+                    storyCardAvatarImg.src = avatarImg.src;
+                    storyCardAvatarImg.style.display = 'block';
+                }
+                if (storyCardAvatarPlaceholder) {
+                    storyCardAvatarPlaceholder.style.display = 'none';
+                }
+            } else {
+                // Аватара нет - показываем placeholder
+                if (storyCardAvatarImg) {
+                    storyCardAvatarImg.style.display = 'none';
+                }
+                if (storyCardAvatarPlaceholder) {
+                    storyCardAvatarPlaceholder.style.display = 'block';
+                }
+            }
+        }
+        
+        function updateAvatarUI(avatarUrl) {
+            const img = document.getElementById('resultAvatarImage');
+            const placeholder = document.getElementById('resultAvatarPlaceholder');
+            
+            if (avatarUrl) {
+                img.src = avatarUrl;
+                img.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
+                
+                // Обновляем аватар в PDF карточке
+                setTimeout(() => {
+                    updateStoryCardAvatar();
+                }, 300);
+            } else {
+                img.style.display = 'none';
+                if (placeholder) {
+                    placeholder.style.display = 'block';
+                    placeholder.textContent = 'Cocktail';
+                }
+                updateStoryCardAvatar();
+            }
+        }
+        
+        async function saveQuizResult(cocktail) {
+            try {
+                // Получаем данные пользователя из Telegram WebApp
+                let telegramUser = null;
+                if (window.Telegram && window.Telegram.WebApp) {
+                    telegramUser = window.Telegram.WebApp.initDataUnsafe?.user;
+                }
+                
+                // Если нет данных из Telegram, создаем минимальный объект
+                if (!telegramUser) {
+                    telegramUser = {
+                        id: Date.now(), // Временный ID
+                        first_name: 'Гость',
+                        username: null,
+                        last_name: null,
+                        language_code: 'ru'
+                    };
+                }
+                
+                // Обновляем аватар на фронте, если Telegram прислал ссылку
+                if (telegramUser.photo_url) {
+                    updateAvatarUI(telegramUser.photo_url);
+                } else {
+                    updateAvatarUI(null);
+                }
+                
+                const payload = {
+                    telegram_user: telegramUser,
+                    result_type: cocktail.name.includes('Шот') ? 'shot' : 'cocktail',
+                    result_label: cocktail.name,
+                    answers: userAnswers,
+                    started_at: quizStartedAt ? new Date(quizStartedAt).toISOString() : new Date().toISOString(),
+                    source: 'organic'
+                };
+                
+                const response = await fetch('/api/quiz_sessions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    console.log('Результат квиза сохранен:', data);
+                } else {
+                    console.warn('Не удалось сохранить результат:', data);
+                    // Не показываем ошибку пользователю, чтобы не портить UX
+                }
+            } catch (error) {
+                console.error('Ошибка при сохранении результата:', error);
+                // Не показываем ошибку пользователю
+            }
         }
 
         (function() {
@@ -843,6 +944,7 @@
 
             document.getElementById('btnStart').addEventListener('click', () => {
                 userAnswers = { q1: null, q2: null, q3: null };
+                quizStartedAt = new Date().toISOString(); // Запоминаем время начала
                 showScene(2);
             });
 
@@ -870,77 +972,234 @@
             document.getElementById('shareResultBtn').addEventListener('click', async () => {
                 try {
                     const resultName = document.getElementById('resultTitle').textContent.replace('Ты — ', '');
-                    await navigator.clipboard.writeText(`https://napibar.ru/quiz/result/${resultName.toLowerCase().replace(' ', '-')}`);
+                    const promoCode = document.getElementById('promo-code')?.textContent?.trim() || 'SPRINGNAPI';
+                    const shareUrl = '<%= ENV["TELEGRAM_WEB_APP_URL"] || "https://t.me/your_bot" %>';
+
+                    // Формируем текст для шеринга
+                    const shareText = `🍹 Я прошёл весенний квиз НАПИ:БАР!\n\nМой коктейль: ${resultName}\n\nПройди квиз и получи промокод ${promoCode} на скидку!`;
+
+                    // Проверяем, запущено ли приложение в Telegram
+                    if (window.Telegram && window.Telegram.WebApp) {
+                        const tg = window.Telegram.WebApp;
+
+                        // Используем Telegram API для шеринга
+                        // Открываем стандартное окно шеринга Telegram
+                        const fullShareUrl = `${shareUrl}?startapp=share`;
+                        const fullText = `${shareText}\n\n${fullShareUrl}`;
+
+                        // Если доступен метод shareToStory (Telegram 7.0+)
+                        if (tg.shareToStory) {
+                            // Можно поделиться в story, но это требует медиа
+                            // Пока используем обычный шеринг
+                        }
+
+                        // Используем openTelegramLink для открытия диалога шеринга
+                        const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(fullShareUrl)}&text=${encodeURIComponent(shareText)}`;
+                        tg.openTelegramLink(telegramShareUrl);
+                    } else {
+                        // Fallback: Используем Telegram Share URL если не в WebApp
+                        const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+                        window.open(telegramShareUrl, '_blank');
+                    }
+
                     showScene(7);
                 } catch (err) {
-                    alert('Ссылка скопирована!');
-                    showScene(7);
+                    console.error('Ошибка при шеринге:', err);
+                    // Fallback: копируем ссылку в буфер обмена
+                    try {
+                        const shareUrl = '<%= ENV["TELEGRAM_WEB_APP_URL"] || window.location.origin %>';
+                        await navigator.clipboard.writeText(shareUrl);
+                        showScene(7);
+                    } catch (clipErr) {
+                        alert('Не удалось поделиться. Попробуйте еще раз.');
+                    }
                 }
             });
 
             document.getElementById('downloadCardBtn').addEventListener('click', async () => {
                 const btn = document.getElementById('downloadCardBtn');
                 const originalText = btn.textContent;
-                btn.textContent = 'Генерация PDF...';
+                btn.textContent = 'Генерация...';
                 btn.disabled = true;
 
                 try {
+                    // Обновляем промокод в story card из основной карточки
+                    const mainPromoCode = document.getElementById('promo-code')?.textContent?.trim() || 'SPRINGNAPI';
+                    const storyPromoCodeElement = document.getElementById('storyCardPromoCode');
+                    if (storyPromoCodeElement) {
+                        storyPromoCodeElement.textContent = mainPromoCode;
+                    }
+
+                    // Обновляем аватар в карточке перед генерацией
+                    updateStoryCardAvatar();
+
+                    // Ждем загрузки изображений (аватар и картинка коктейля)
+                    await new Promise(resolve => setTimeout(resolve, 800));
+
                     const storyCard = document.getElementById('storyCard');
-                    
+
+                    // Генерируем canvas с высоким качеством
                     const canvas = await html2canvas(storyCard, {
                         scale: 2,
                         useCORS: true,
+                        backgroundColor: '#F5F0E8',
+                        logging: false,
                         allowTaint: true,
-                        backgroundColor: '#F5F0E8'
+                        imageTimeout: 15000
                     });
 
                     const imgData = canvas.toDataURL('image/jpeg', 0.95);
-                    
+
+                    // Получаем название коктейля и промокод для имени файла
+                    const cocktailName = document.getElementById('resultTitle')?.textContent?.replace('Ты — ', '').replace(/\s+/g, '-').replace(/#/g, '') || 'Cocktail';
+                    const promoCode = mainPromoCode.replace(/\s+/g, '-');
+                    const fileName = `NAPIBAR-${cocktailName}-${promoCode}.pdf`;
+
+                    // Проверяем, мобильное ли устройство
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    const isTelegram = window.Telegram && window.Telegram.WebApp;
+
+                    // Для мобильных устройств используем другой подход
+                    if (isMobile || isTelegram) {
+                        // Вариант 1: Используем Web Share API для мобильных
+                        if (navigator.share && navigator.canShare) {
+                            try {
+                                // Создаем PDF
+                                const { jsPDF } = window.jspdf;
+                                const pdf = new jsPDF({
+                                    orientation: 'portrait',
+                                    unit: 'px',
+                                    format: [1080, 1920],
+                                    compress: true
+                                });
+                                pdf.addImage(imgData, 'JPEG', 0, 0, 1080, 1920, undefined, 'FAST');
+                                const pdfBlob = pdf.output('blob');
+                                const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+                                // Пробуем поделиться через Web Share API
+                                if (navigator.canShare({ files: [pdfFile] })) {
+                                    await navigator.share({
+                                        files: [pdfFile],
+                                        title: fileName,
+                                        text: 'Мой результат квиза НАПИ:БАР'
+                                    });
+                                    
+                                    btn.textContent = '✓ Отправлено';
+                                    setTimeout(() => {
+                                        btn.textContent = originalText;
+                                        btn.disabled = false;
+                                    }, 2000);
+                                    return;
+                                }
+                            } catch (shareError) {
+                                console.log('Web Share API не сработал, пробуем другой метод:', shareError);
+                            }
+                        }
+
+                        // Вариант 2: Скачиваем как изображение вместо PDF (более надежно на мобильных)
+                        try {
+                            // Создаем ссылку на изображение
+                            const link = document.createElement('a');
+                            link.href = imgData;
+                            link.download = fileName.replace('.pdf', '.jpg');
+                            
+                            // Для мобильных используем прямой вызов
+                            if (isMobile) {
+                                // Создаем временный элемент и триггерим клик
+                                document.body.appendChild(link);
+                                
+                                // Пробуем программный клик через MouseEvent
+                                const clickEvent = new MouseEvent('click', {
+                                    bubbles: true,
+                                    cancelable: true,
+                                    view: window,
+                                    button: 0
+                                });
+                                link.dispatchEvent(clickEvent);
+                                
+                                setTimeout(() => {
+                                    if (link.parentNode) {
+                                        document.body.removeChild(link);
+                                    }
+                                }, 100);
+                            } else {
+                                link.click();
+                            }
+                            
+                            btn.textContent = '✓ Скачано';
+                            setTimeout(() => {
+                                btn.textContent = originalText;
+                                btn.disabled = false;
+                            }, 2000);
+                            return;
+                        } catch (imgError) {
+                            console.log('Скачивание изображения не сработало:', imgError);
+                        }
+                    }
+
+                    // Для десктопов - обычный метод с PDF
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF({
                         orientation: 'portrait',
                         unit: 'px',
-                        format: [1080, 1920]
+                        format: [1080, 1920],
+                        compress: true
                     });
 
-                    pdf.addImage(imgData, 'JPEG', 0, 0, 1080, 1920);
-                    pdf.save('NAPI-BAR-Result.pdf');
+                    pdf.addImage(imgData, 'JPEG', 0, 0, 1080, 1920, undefined, 'FAST');
 
-                    btn.textContent = '✓ Скачано!';
+                    const pdfBlob = pdf.output('blob');
+                    const url = URL.createObjectURL(pdfBlob);
+                    
+                    // Используем window.open вместо программного клика
+                    const newWindow = window.open(url, '_blank');
+                    
+                    // Если window.open заблокирован, пробуем ссылку
+                    if (!newWindow) {
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = fileName;
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        
+                        // Используем MouseEvent для более надежного клика
+                        const clickEvent = new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window,
+                            button: 0
+                        });
+                        link.dispatchEvent(clickEvent);
+                        
+                        setTimeout(() => {
+                            if (link.parentNode) {
+                                document.body.removeChild(link);
+                            }
+                            URL.revokeObjectURL(url);
+                        }, 1000);
+                    } else {
+                        // Освобождаем URL после открытия
+                        setTimeout(() => {
+                            URL.revokeObjectURL(url);
+                        }, 1000);
+                    }
+
+                    console.log('PDF создан:', fileName);
+
+                    btn.textContent = '✓ Скачано';
                     setTimeout(() => {
                         btn.textContent = originalText;
                         btn.disabled = false;
                     }, 2000);
-
                 } catch (error) {
-                    console.error('PDF generation error:', error);
-                    alert('Не удалось создать PDF. Попробуйте сделать скриншот.');
+                    console.error('Ошибка при создании PDF:', error);
+                    alert('Не удалось создать PDF. Попробуйте еще раз.');
                     btn.textContent = originalText;
                     btn.disabled = false;
                 }
             });
 
-            document.getElementById('backToResultBtn').addEventListener('click', () => {
-                showScene(6);
-            });
-
-            const cocktailImg = document.querySelector('.cocktail-image-large');
-            if (cocktailImg) {
-                let clickCount = 0;
-                cocktailImg.addEventListener('click', () => {
-                    clickCount++;
-                    if (clickCount === 3) {
-                        showScene(1);
-                        clickCount = 0;
-                    }
-                    setTimeout(() => clickCount = 0, 700);
-                });
-            }
-
-            document.querySelector('.brand-logo img').addEventListener('error', function() {
-                this.style.display = 'none';
-                this.nextElementSibling.style.display = 'flex';
-            });
+            document.getElementById('backToResultBtn').addEventListener('click', () => showScene(6));
 
             // Инициализация Telegram Web App
             if (window.Telegram && window.Telegram.WebApp) {
@@ -956,7 +1215,6 @@
                 const user = tg.initDataUnsafe?.user;
                 if (user) {
                     console.log('Telegram user:', user);
-                    // Можно сохранить данные пользователя для использования в квизе
                 }
                 
                 // Включить закрытие по кнопке назад
@@ -968,4 +1226,3 @@
     </script>
 </body>
 </html>
-

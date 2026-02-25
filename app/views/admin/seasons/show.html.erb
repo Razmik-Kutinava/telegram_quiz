@@ -1,0 +1,90 @@
+<% content_for :title, @season.name.upcase %>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--terminal-accent); text-transform: uppercase;"><%= @season.name %></h2>
+    <div style="display: flex; gap: 12px;">
+      <%= link_to edit_admin_season_path(@season), class: "terminal-btn primary" do %>
+        EDIT
+      <% end %>
+      <%= link_to admin_seasons_path, class: "terminal-btn" do %>
+        BACK
+      <% end %>
+    </div>
+  </div>
+
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">
+      <%= @season.name %>
+      <% if @season.active? %>
+        <span class="terminal-badge success" style="margin-left: 12px;">ACTIVE</span>
+      <% else %>
+        <span class="terminal-badge default" style="margin-left: 12px;">INACTIVE</span>
+      <% end %>
+    </div>
+    <div style="padding: 16px 0;">
+      <div class="terminal-grid terminal-grid-2" style="gap: 16px;">
+        <div style="grid-column: span 2;">
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">DESCRIPTION</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @season.description || "NO DESCRIPTION" %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">STARTED</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @season.started_at&.strftime("%d.%m.%Y %H:%M") || "NOT SET" %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">ENDED</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @season.ended_at&.strftime("%d.%m.%Y %H:%M") || "NOT SET" %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">CREATED</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @season.created_at.strftime("%d.%m.%Y %H:%M") %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">TOTAL SESSIONS</div>
+          <div style="margin-top: 4px;">
+            <span class="terminal-badge default"><%= @season.quiz_sessions.count %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Сессии сезона -->
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">SEASON SESSIONS (<%= @quiz_sessions.count %>)</div>
+    <div style="overflow-x: auto;">
+      <table class="terminal-table">
+        <thead>
+          <tr>
+            <th>USER</th>
+            <th>RESULT</th>
+            <th>COMPLETED</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @quiz_sessions.each do |session| %>
+            <tr>
+              <td>
+                <div style="color: var(--terminal-fg); font-size: 12px;">
+                  <%= session.user.first_name || session.user.username || "ID: #{session.user.telegram_id}" %>
+                </div>
+                <div style="color: var(--terminal-text-muted); font-size: 11px;">@<%= session.user.username || "no username" %></div>
+              </td>
+              <td>
+                <span class="terminal-badge info"><%= session.result_label %></span>
+              </td>
+              <td style="color: var(--terminal-text-muted); font-size: 12px;"><%= session.completed_at&.strftime("%d.%m.%Y %H:%M") || "NOT COMPLETED" %></td>
+              <td>
+                <%= link_to admin_quiz_session_path(session), class: "terminal-link" do %>
+                  VIEW
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

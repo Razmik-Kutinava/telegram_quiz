@@ -1,0 +1,84 @@
+<% content_for :title, "DASHBOARD" %>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <!-- Статистические карточки -->
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">SYSTEM OVERVIEW</div>
+    <div class="terminal-grid terminal-grid-4">
+      <div class="terminal-metric">
+        <div class="terminal-metric-label">TOTAL USERS</div>
+        <div class="terminal-metric-value"><%= @total_users %></div>
+      </div>
+      <div class="terminal-metric">
+        <div class="terminal-metric-label">TOTAL SESSIONS</div>
+        <div class="terminal-metric-value"><%= @total_sessions %></div>
+      </div>
+      <div class="terminal-metric">
+        <div class="terminal-metric-label">TODAY</div>
+        <div class="terminal-metric-value"><%= @today_sessions %></div>
+      </div>
+      <div class="terminal-metric">
+        <div class="terminal-metric-label">SEASONS</div>
+        <div class="terminal-metric-value"><%= @total_seasons %></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Популярные результаты -->
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">POPULAR RESULTS</div>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <% @results_stats.each do |result, count| %>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+          <span style="color: var(--terminal-fg); font-size: 12px; text-transform: uppercase;"><%= result %></span>
+          <div style="display: flex; align-items: center; gap: 12px; flex: 1; max-width: 300px;">
+            <div class="terminal-progress" style="flex: 1;">
+              <div class="terminal-progress-bar" style="width: <%= (count.to_f / @total_sessions * 100).round %>%"></div>
+            </div>
+            <span style="color: var(--terminal-accent); font-size: 12px; font-weight: 600; min-width: 40px; text-align: right;"><%= count %></span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Последние сессии -->
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">RECENT SESSIONS</div>
+    <div style="overflow-x: auto;">
+      <table class="terminal-table">
+        <thead>
+          <tr>
+            <th>USER</th>
+            <th>RESULT</th>
+            <th>SEASON</th>
+            <th>TIME</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_sessions.each do |session| %>
+            <tr>
+              <td>
+                <div style="color: var(--terminal-fg); font-size: 12px;">
+                  <%= session.user.first_name || session.user.username || "ID: #{session.user.telegram_id}" %>
+                </div>
+                <div style="color: var(--terminal-text-muted); font-size: 11px;">@<%= session.user.username || "no username" %></div>
+              </td>
+              <td>
+                <span class="terminal-badge info"><%= session.result_label %></span>
+              </td>
+              <td style="color: var(--terminal-fg); font-size: 12px;"><%= session.season.name %></td>
+              <td style="color: var(--terminal-text-muted); font-size: 12px;"><%= session.created_at.strftime("%d.%m.%Y %H:%M") %></td>
+              <td>
+                <%= link_to admin_quiz_session_path(session), class: "terminal-link" do %>
+                  VIEW
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

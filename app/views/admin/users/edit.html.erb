@@ -1,0 +1,54 @@
+<% content_for :title, "EDIT USER" %>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--terminal-accent); text-transform: uppercase;">EDIT USER</h2>
+    <%= link_to admin_user_path(@user), class: "terminal-btn" do %>
+      BACK
+    <% end %>
+  </div>
+
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">USER INFORMATION</div>
+    <div style="padding: 16px 0;">
+      <%= form_with model: [:admin, @user], local: true, style: "display: flex; flex-direction: column; gap: 16px;" do |f| %>
+        <% if @user.errors.any? %>
+          <div class="terminal-alert error">
+            <ul style="margin: 0; padding-left: 20px; list-style: disc;">
+              <% @user.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="terminal-grid terminal-grid-2" style="gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <%= f.label :first_name, "FIRST NAME", class: "terminal-text-muted", style: "font-size: 11px; text-transform: uppercase;" %>
+            <%= f.text_field :first_name, class: "terminal-input" %>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <%= f.label :last_name, "LAST NAME", class: "terminal-text-muted", style: "font-size: 11px; text-transform: uppercase;" %>
+            <%= f.text_field :last_name, class: "terminal-input" %>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <%= f.label :username, "USERNAME", class: "terminal-text-muted", style: "font-size: 11px; text-transform: uppercase;" %>
+            <%= f.text_field :username, class: "terminal-input" %>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <%= f.label :language_code, "LANGUAGE", class: "terminal-text-muted", style: "font-size: 11px; text-transform: uppercase;" %>
+            <%= f.text_field :language_code, class: "terminal-input" %>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px; padding-top: 16px; border-top: 1px solid var(--terminal-panel-border);">
+          <%= link_to "CANCEL", admin_user_path(@user), class: "terminal-btn" %>
+          <%= f.submit "SAVE CHANGES", class: "terminal-btn primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

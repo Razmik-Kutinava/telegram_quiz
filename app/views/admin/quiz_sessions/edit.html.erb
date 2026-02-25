@@ -1,0 +1,72 @@
+<% content_for :title, "EDIT SESSION" %>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--terminal-accent); text-transform: uppercase;">EDIT SESSION</h2>
+    <%= link_to admin_quiz_session_path(@quiz_session), class: "terminal-btn" do %>
+      BACK
+    <% end %>
+  </div>
+
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">SESSION INFORMATION</div>
+    <div style="padding: 16px 0;">
+      <%= form_with model: [:admin, @quiz_session], local: true, style: "display: flex; flex-direction: column; gap: 16px;" do |f| %>
+        <% if @quiz_session.errors.any? %>
+          <div class="terminal-alert error">
+            <ul style="margin: 0; padding-left: 20px; list-style: disc;">
+              <% @quiz_session.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="terminal-grid terminal-grid-2" style="gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <%= f.label :result_type, "RESULT TYPE", class: "terminal-text-muted", style: "font-size: 11px; text-transform: uppercase;" %>
+            <%= f.select :result_type, 
+                [['Cocktail', 'cocktail'], ['Shot', 'shot']],
+                {},
+                { class: "terminal-select" } %>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <%= f.label :result_label, "RESULT LABEL", class: "terminal-text-muted", style: "font-size: 11px; text-transform: uppercase;" %>
+            <%= f.text_field :result_label, class: "terminal-input" %>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <%= f.label :season_id, "SEASON", class: "terminal-text-muted", style: "font-size: 11px; text-transform: uppercase;" %>
+            <%= f.collection_select :season_id, Season.all, :id, :name, 
+                {},
+                { class: "terminal-select" } %>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <%= f.label :source, "SOURCE", class: "terminal-text-muted", style: "font-size: 11px; text-transform: uppercase;" %>
+            <%= f.select :source, 
+                [['Organic', 'organic'], ['Ad', 'ad'], ['Broadcast', 'broadcast']],
+                { include_blank: true },
+                { class: "terminal-select" } %>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <%= f.label :started_at, "STARTED", class: "terminal-text-muted", style: "font-size: 11px; text-transform: uppercase;" %>
+            <%= f.datetime_local_field :started_at, class: "terminal-input" %>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <%= f.label :completed_at, "COMPLETED", class: "terminal-text-muted", style: "font-size: 11px; text-transform: uppercase;" %>
+            <%= f.datetime_local_field :completed_at, class: "terminal-input" %>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px; padding-top: 16px; border-top: 1px solid var(--terminal-panel-border);">
+          <%= link_to "CANCEL", admin_quiz_session_path(@quiz_session), class: "terminal-btn" %>
+          <%= f.submit "SAVE CHANGES", class: "terminal-btn primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

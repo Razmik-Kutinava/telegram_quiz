@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html data-theme="amber" class="terminal-ui">
+  <head>
+    <title>ADMIN LOGIN</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "terminal_ui", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body style="background: #0a0a0a; color: #00ff00; min-height: 100vh; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center;">
+    <div class="terminal-panel corner-brackets" style="max-width: 400px; width: 100%; margin: 0 16px;">
+      <div class="terminal-panel-header" style="text-align: center; margin-bottom: 24px;">
+        ADMIN PANEL
+      </div>
+      
+      <%= form_with url: admin_login_path, method: :post, local: true, style: "display: flex; flex-direction: column; gap: 16px;" do |f| %>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <%= f.label :password, "PASSWORD", class: "terminal-text-muted", style: "font-size: 11px; text-transform: uppercase;" %>
+          <%= f.password_field :password, 
+              class: "terminal-input",
+              placeholder: "ENTER PASSWORD",
+              required: true,
+              autofocus: true %>
+        </div>
+
+        <% if alert %>
+          <div class="terminal-alert error">
+            <%= alert %>
+          </div>
+        <% end %>
+
+        <div>
+          <%= f.submit "LOGIN", class: "terminal-btn primary", style: "width: 100%;" %>
+        </div>
+      <% end %>
+    </div>
+  </body>
+</html>

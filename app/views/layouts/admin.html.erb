@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html data-theme="amber" class="terminal-ui">
+  <head>
+    <title>ADMIN PANEL - <%= content_for(:title) || "DASHBOARD" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "terminal_ui", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body style="background: #0a0a0a; color: #00ff00; min-height: 100vh; margin: 0; padding: 0;">
+    <% if respond_to?(:admin_signed_in?) && admin_signed_in? %>
+      <!-- Sidebar -->
+      <div class="terminal-sidebar" style="position: fixed; top: 0; left: 0; width: 240px; height: 100vh; z-index: 1000; overflow-y: auto;">
+        <div style="display: flex; flex-direction: column; height: 100%;">
+          <!-- Logo -->
+          <div style="padding: 20px; border-bottom: 1px solid var(--terminal-panel-border);">
+            <h1 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--terminal-accent); text-transform: uppercase; letter-spacing: 1px;">ADMIN PANEL</h1>
+          </div>
+
+          <!-- Navigation -->
+          <nav style="flex: 1; padding: 16px 0; overflow-y: auto;">
+            <%= link_to admin_root_path, class: "terminal-sidebar-nav-link #{request.path == admin_root_path ? 'active' : ''}" do %>
+              DASHBOARD
+            <% end %>
+
+            <%= link_to admin_users_path, class: "terminal-sidebar-nav-link #{request.path.include?('/admin/users') ? 'active' : ''}" do %>
+              USERS
+            <% end %>
+
+            <%= link_to admin_quiz_sessions_path, class: "terminal-sidebar-nav-link #{request.path.include?('/admin/quiz_sessions') ? 'active' : ''}" do %>
+              SESSIONS
+            <% end %>
+
+            <%= link_to admin_seasons_path, class: "terminal-sidebar-nav-link #{request.path.include?('/admin/seasons') ? 'active' : ''}" do %>
+              SEASONS
+            <% end %>
+          </nav>
+
+          <!-- Logout -->
+          <div style="padding: 16px; border-top: 1px solid var(--terminal-panel-border);">
+            <%= button_to admin_logout_path, method: :delete, class: "terminal-btn danger", style: "width: 100%;" do %>
+              LOGOUT
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div style="margin-left: 240px; min-height: 100vh;">
+        <!-- Top Bar -->
+        <div style="position: sticky; top: 0; z-index: 40; background: var(--terminal-panel-bg); border-bottom: 1px solid var(--terminal-panel-border); padding: 16px 24px;">
+          <h2 style="margin: 0; font-size: 16px; font-weight: 600; color: var(--terminal-accent); text-transform: uppercase; letter-spacing: 1px;"><%= content_for(:title) || "DASHBOARD" %></h2>
+        </div>
+
+        <!-- Content -->
+        <main style="padding: 24px; max-width: 1600px; margin: 0 auto;">
+          <% if notice %>
+            <div class="terminal-alert success" role="alert">
+              <%= notice %>
+            </div>
+          <% end %>
+
+          <% if alert %>
+            <div class="terminal-alert error" role="alert">
+              <%= alert %>
+            </div>
+          <% end %>
+
+          <%= yield %>
+        </main>
+      </div>
+    <% else %>
+      <%= yield %>
+    <% end %>
+  </body>
+</html>

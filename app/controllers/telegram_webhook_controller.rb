@@ -16,6 +16,24 @@ class TelegramWebhookController < ApplicationController
       # Обработка команд
       case text
       when '/start'
+        # Создаем или находим пользователя
+        if message[:from]
+          user_data = {
+            id: message[:from][:id] || message[:from]['id'],
+            username: message[:from][:username] || message[:from]['username'],
+            first_name: message[:from][:first_name] || message[:from]['first_name'],
+            last_name: message[:from][:last_name] || message[:from]['last_name'],
+            language_code: (message[:from][:language_code] || message[:from]['language_code'] || 'ru')
+          }
+          
+          begin
+            User.find_or_create_from_telegram(user_data)
+          rescue => e
+            Rails.logger.error "Error creating user: #{e.message}"
+            Rails.logger.error e.backtrace.join("\n")
+          end
+        end
+        
         send_message_with_button(chat_id, 
           "Добро пожаловать в квиз НАПИ:БАР! 🍹\n\nНажмите на кнопку ниже, чтобы начать квиз и узнать свой идеальный коктейль.",
           "Открыть квиз",

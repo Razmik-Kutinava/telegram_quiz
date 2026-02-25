@@ -1,0 +1,79 @@
+<% content_for :title, "QUIZ SESSIONS" %>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <!-- Фильтры -->
+  <div class="terminal-panel">
+    <%= form_with url: admin_quiz_sessions_path, method: :get, local: true, style: "display: flex; gap: 12px; flex-wrap: wrap;" do |f| %>
+      <div style="flex: 1; min-width: 200px;">
+        <%= f.text_field :search,
+            value: params[:search],
+            placeholder: "SEARCH BY NAME, USERNAME OR RESULT...",
+            class: "terminal-input" %>
+      </div>
+      <div style="min-width: 200px;">
+        <%= f.select :season_id,
+            options_from_collection_for_select(Season.all, :id, :name, params[:season_id]),
+            { include_blank: "ALL SEASONS" },
+            { class: "terminal-select" } %>
+      </div>
+      <%= f.submit "APPLY", class: "terminal-btn primary" %>
+      <% if params[:search].present? || params[:season_id].present? %>
+        <%= link_to "RESET", admin_quiz_sessions_path, class: "terminal-btn" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Таблица -->
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">ALL SESSIONS (<%= @quiz_sessions.count %>)</div>
+    <div style="overflow-x: auto;">
+      <table class="terminal-table">
+        <thead>
+          <tr>
+            <th>USER</th>
+            <th>RESULT</th>
+            <th>SEASON</th>
+            <th>SOURCE</th>
+            <th>COMPLETED</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @quiz_sessions.each do |session| %>
+            <tr>
+              <td>
+                <div style="color: var(--terminal-fg); font-size: 12px;">
+                  <%= session.user.first_name || session.user.username || "ID: #{session.user.telegram_id}" %>
+                </div>
+                <div style="color: var(--terminal-text-muted); font-size: 11px;">@<%= session.user.username || "no username" %></div>
+              </td>
+              <td>
+                <span class="terminal-badge info"><%= session.result_label %></span>
+              </td>
+              <td style="color: var(--terminal-fg); font-size: 12px;"><%= session.season.name %></td>
+              <td>
+                <span class="terminal-badge default"><%= session.source || "organic" %></span>
+              </td>
+              <td style="color: var(--terminal-text-muted); font-size: 12px;"><%= session.completed_at&.strftime("%d.%m.%Y %H:%M") || "NOT COMPLETED" %></td>
+              <td>
+                <div style="display: flex; gap: 12px;">
+                  <%= link_to admin_quiz_session_path(session), class: "terminal-link" do %>
+                    VIEW
+                  <% end %>
+                  <%= link_to edit_admin_quiz_session_path(session), class: "terminal-link" do %>
+                    EDIT
+                  <% end %>
+                  <%= link_to admin_quiz_session_path(session), method: :delete,
+                      data: { confirm: "ARE YOU SURE?" },
+                      class: "terminal-link", style: "color: #ff4444;" do %>
+                    DELETE
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<% content_for :title, "SEASONS" %>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h2 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--terminal-accent); text-transform: uppercase;">SEASONS MANAGEMENT</h2>
+      <p class="terminal-text-muted" style="margin-top: 4px; font-size: 11px;">CREATE AND MANAGE QUIZ SEASONS</p>
+    </div>
+    <%= link_to new_admin_season_path, class: "terminal-btn primary" do %>
+      + CREATE SEASON
+    <% end %>
+  </div>
+
+  <!-- Таблица -->
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">ALL SEASONS (<%= @seasons.count %>)</div>
+    <div style="overflow-x: auto;">
+      <table class="terminal-table">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>DESCRIPTION</th>
+            <th>STATUS</th>
+            <th>SESSIONS</th>
+            <th>CREATED</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @seasons.each do |season| %>
+            <tr>
+              <td style="color: var(--terminal-fg); font-size: 12px; font-weight: 600;"><%= season.name %></td>
+              <td style="color: var(--terminal-text-muted); font-size: 12px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= season.description || "NO DESCRIPTION" %></td>
+              <td>
+                <% if season.active? %>
+                  <span class="terminal-badge success">ACTIVE</span>
+                <% else %>
+                  <span class="terminal-badge default">INACTIVE</span>
+                <% end %>
+              </td>
+              <td>
+                <span class="terminal-badge default"><%= season.quiz_sessions.count %></span>
+              </td>
+              <td style="color: var(--terminal-text-muted); font-size: 12px;"><%= season.created_at.strftime("%d.%m.%Y") %></td>
+              <td>
+                <div style="display: flex; gap: 12px;">
+                  <%= link_to admin_season_path(season), class: "terminal-link" do %>
+                    VIEW
+                  <% end %>
+                  <%= link_to edit_admin_season_path(season), class: "terminal-link" do %>
+                    EDIT
+                  <% end %>
+                  <%= link_to admin_season_path(season), method: :delete,
+                      data: { confirm: "ARE YOU SURE? ALL SESSIONS OF THIS SEASON WILL BE DELETED!" },
+                      class: "terminal-link", style: "color: #ff4444;" do %>
+                    DELETE
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

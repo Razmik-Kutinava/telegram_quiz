@@ -9,6 +9,24 @@ Rails.application.routes.draw do
   # Telegram webhook
   post "telegram/webhook", to: "telegram_webhook#webhook"
 
+  # API для сохранения результатов квиза
+  namespace :api do
+    post "quiz_sessions", to: "quiz_sessions#create"
+  end
+
+  # Админ-панель
+  namespace :admin do
+    get '/login', to: 'sessions#new', as: :login
+    post '/login', to: 'sessions#create'
+    delete '/logout', to: 'sessions#destroy', as: :logout
+    
+    root 'dashboard#index'
+    
+    resources :users, only: [:index, :show, :edit, :update, :destroy]
+    resources :quiz_sessions, only: [:index, :show, :edit, :update, :destroy]
+    resources :seasons
+  end
+
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker

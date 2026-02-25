@@ -1,0 +1,85 @@
+<% content_for :title, "USER DETAILS" %>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--terminal-accent); text-transform: uppercase;">USER INFORMATION</h2>
+    <div style="display: flex; gap: 12px;">
+      <%= link_to edit_admin_user_path(@user), class: "terminal-btn primary" do %>
+        EDIT
+      <% end %>
+      <%= link_to admin_users_path, class: "terminal-btn" do %>
+        BACK
+      <% end %>
+    </div>
+  </div>
+
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">
+      <%= @user.first_name || "NO NAME" %>
+      <% if @user.last_name.present? %>
+        <%= @user.last_name %>
+      <% end %>
+    </div>
+    <div style="padding: 16px 0;">
+      <div class="terminal-grid terminal-grid-2" style="gap: 16px;">
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">FIRST NAME</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @user.first_name || "NOT SET" %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">LAST NAME</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @user.last_name || "NOT SET" %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">USERNAME</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;">@<%= @user.username || "no username" %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">TELEGRAM ID</div>
+          <div style="color: var(--terminal-fg); font-size: 12px; font-family: var(--font-mono);"><%= @user.telegram_id %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">LANGUAGE</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @user.language_code %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">REGISTERED</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @user.created_at.strftime("%d.%m.%Y %H:%M") %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Сессии пользователя -->
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">QUIZ SESSIONS (<%= @quiz_sessions.count %>)</div>
+    <div style="overflow-x: auto;">
+      <table class="terminal-table">
+        <thead>
+          <tr>
+            <th>RESULT</th>
+            <th>SEASON</th>
+            <th>COMPLETED</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @quiz_sessions.each do |session| %>
+            <tr>
+              <td>
+                <span class="terminal-badge info"><%= session.result_label %></span>
+              </td>
+              <td style="color: var(--terminal-fg); font-size: 12px;"><%= session.season.name %></td>
+              <td style="color: var(--terminal-text-muted); font-size: 12px;"><%= session.completed_at&.strftime("%d.%m.%Y %H:%M") || "NOT COMPLETED" %></td>
+              <td>
+                <%= link_to admin_quiz_session_path(session), class: "terminal-link" do %>
+                  VIEW
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

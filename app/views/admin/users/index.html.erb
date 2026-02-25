@@ -1,0 +1,72 @@
+<% content_for :title, "USERS" %>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <!-- Поиск -->
+  <div class="terminal-panel">
+    <%= form_with url: admin_users_path, method: :get, local: true, style: "display: flex; gap: 12px;" do |f| %>
+      <div style="flex: 1;">
+        <%= f.text_field :search,
+            value: params[:search],
+            placeholder: "SEARCH BY NAME, USERNAME OR ID...",
+            class: "terminal-input" %>
+      </div>
+      <%= f.submit "SEARCH", class: "terminal-btn primary" %>
+      <% if params[:search].present? %>
+        <%= link_to "RESET", admin_users_path, class: "terminal-btn" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Таблица -->
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">USERS LIST (<%= @users.count %>)</div>
+    <div style="overflow-x: auto;">
+      <table class="terminal-table">
+        <thead>
+          <tr>
+            <th>USER</th>
+            <th>TELEGRAM ID</th>
+            <th>SESSIONS</th>
+            <th>REGISTERED</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @users.each do |user| %>
+            <tr>
+              <td>
+                <div style="color: var(--terminal-fg); font-size: 12px;">
+                  <%= user.first_name || "NO NAME" %>
+                  <% if user.last_name.present? %>
+                    <%= user.last_name %>
+                  <% end %>
+                </div>
+                <div style="color: var(--terminal-text-muted); font-size: 11px;">@<%= user.username || "no username" %></div>
+              </td>
+              <td style="color: var(--terminal-fg); font-size: 12px; font-family: var(--font-mono);"><%= user.telegram_id %></td>
+              <td>
+                <span class="terminal-badge default"><%= user.quiz_sessions.count %></span>
+              </td>
+              <td style="color: var(--terminal-text-muted); font-size: 12px;"><%= user.created_at.strftime("%d.%m.%Y %H:%M") %></td>
+              <td>
+                <div style="display: flex; gap: 12px;">
+                  <%= link_to admin_user_path(user), class: "terminal-link" do %>
+                    VIEW
+                  <% end %>
+                  <%= link_to edit_admin_user_path(user), class: "terminal-link" do %>
+                    EDIT
+                  <% end %>
+                  <%= link_to admin_user_path(user), method: :delete,
+                      data: { confirm: "ARE YOU SURE?" },
+                      class: "terminal-link", style: "color: #ff4444;" do %>
+                    DELETE
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

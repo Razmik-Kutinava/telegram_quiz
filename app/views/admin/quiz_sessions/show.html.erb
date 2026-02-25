@@ -1,0 +1,65 @@
+<% content_for :title, "SESSION DETAILS" %>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--terminal-accent); text-transform: uppercase;">SESSION DETAILS</h2>
+    <div style="display: flex; gap: 12px;">
+      <%= link_to edit_admin_quiz_session_path(@quiz_session), class: "terminal-btn primary" do %>
+        EDIT
+      <% end %>
+      <%= link_to admin_quiz_sessions_path, class: "terminal-btn" do %>
+        BACK
+      <% end %>
+    </div>
+  </div>
+
+  <div class="terminal-panel corner-brackets">
+    <div class="terminal-panel-header">
+      <%= @quiz_session.user.first_name || @quiz_session.user.username || "ID: #{@quiz_session.user.telegram_id}" %>
+    </div>
+    <div style="padding: 16px 0;">
+      <div class="terminal-grid terminal-grid-2" style="gap: 16px;">
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">RESULT</div>
+          <div style="margin-top: 4px;">
+            <span class="terminal-badge info"><%= @quiz_session.result_label %></span>
+          </div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">RESULT TYPE</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @quiz_session.result_type %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">SEASON</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @quiz_session.season.name %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">SOURCE</div>
+          <div style="margin-top: 4px;">
+            <span class="terminal-badge default"><%= @quiz_session.source || "organic" %></span>
+          </div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">STARTED</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @quiz_session.started_at&.strftime("%d.%m.%Y %H:%M:%S") || "NOT SET" %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">COMPLETED</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @quiz_session.completed_at&.strftime("%d.%m.%Y %H:%M:%S") || "NOT COMPLETED" %></div>
+        </div>
+        <div>
+          <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">CREATED</div>
+          <div style="color: var(--terminal-fg); font-size: 12px;"><%= @quiz_session.created_at.strftime("%d.%m.%Y %H:%M:%S") %></div>
+        </div>
+      </div>
+
+      <!-- Ответы -->
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--terminal-panel-border);">
+        <div class="terminal-text-muted" style="font-size: 11px; text-transform: uppercase; margin-bottom: 8px;">USER ANSWERS</div>
+        <div class="terminal-code">
+<%= JSON.pretty_generate(@quiz_session.answers) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
