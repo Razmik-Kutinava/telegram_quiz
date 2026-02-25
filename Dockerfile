@@ -75,6 +75,6 @@ COPY --chown=rails:rails --from=build /rails /rails
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start server - Render will set PORT dynamically
-# Don't hardcode port, use environment variable
-CMD ["sh", "-c", "PORT=${PORT:-3000} ./bin/rails server -b 0.0.0.0 -p $PORT"]
+# Start server - Puma will use PORT from environment (configured in config/puma.rb)
+# Render automatically sets PORT environment variable
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
