@@ -1,3 +1,21 @@
 <svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
+  <!-- Фон - бежевый с градиентом -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5F0E8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EBE5DC;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Фон с закругленными углами -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGradient)"/>
+  
+  <!-- Текст НАПИ -->
+  <text x="256" y="240" font-family="Inter, Arial, sans-serif" font-size="140" font-weight="700" fill="#2D2D2D" text-anchor="middle" letter-spacing="4">НАПИ</text>
+  
+  <!-- Двоеточие розовое -->
+  <text x="256" y="240" font-family="Inter, Arial, sans-serif" font-size="140" font-weight="700" fill="#E91E6D" text-anchor="middle" letter-spacing="4">:</text>
+  
+  <!-- Текст БАР розовый -->
+  <text x="256" y="340" font-family="Inter, Arial, sans-serif" font-size="140" font-weight="700" fill="#E91E6D" text-anchor="middle" letter-spacing="4">БАР</text>
 </svg>
