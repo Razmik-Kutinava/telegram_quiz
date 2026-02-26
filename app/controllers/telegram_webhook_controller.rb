@@ -105,9 +105,16 @@ class TelegramWebhookController < ApplicationController
         if text == '/start' || text&.start_with?('/start')
           Rails.logger.info "Processing /start command"
           web_app_url = ENV['TELEGRAM_WEB_APP_URL'] || 'https://telegram-quiz-sirr.onrender.com'
+
+          fancy_text =
+            "🌸 <b>Весенний квиз · НАПИ:БАР</b> 🌸\n\n" \
+            "Узнай свой весенний вкус и получи <b>-10% на сезонное меню</b>\n" \
+            "до <b>31 марта</b> в нашем баре.\n\n" \
+            "Нажми <b>«Пройти квиз»</b>, чтобы начать весну ярко. 🍹"
+
           send_message_with_button(
             chat_id,
-            "Весенний квиз\nНАПИ:БАР\nУзнай свой вкус и\nполучи -10% на\nсезонное меню до 31\nмарта",
+            fancy_text,
             "Пройти квиз",
             web_app_url
           )
