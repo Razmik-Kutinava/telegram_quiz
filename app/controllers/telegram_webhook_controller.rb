@@ -56,43 +56,20 @@ class TelegramWebhookController < ApplicationController
     Rails.logger.info "Remote IP: #{request.remote_ip}"
     Rails.logger.info "Params keys: #{params.keys.inspect}"
     
-    # Читаем body ДО любых проверок
-    request.body.rewind
-    raw_body = request.body.read
-    Rails.logger.info "Raw body length: #{raw_body.length}"
-    Rails.logger.info "Raw body (first 500 chars): #{raw_body[0..500]}" if raw_body.present?
-    
     begin
-      # Парсим данные из body (Telegram всегда отправляет JSON в body)
-      data = nil
+      # Самый надежный вариант: используем только params, без ручного парсинга body.
+      # Rails уже распарсит JSON из Telegram, если Content-Type: application/json.
+      data = params.to_unsafe_h
+      Rails.logger.info "Data from params: #{data.inspect}"
       
-      if raw_body.present?
-        begin
-          data = JSON.parse(raw_body)
-          data = data.with_indifferent_access if data.is_a?(Hash)
-          Rails.logger.info "Successfully parsed JSON from body"
-        rescue JSON::ParserError => e
-          Rails.logger.error "Failed to parse JSON: #{e.message}"
-          Rails.logger.error "Body content: #{raw_body}"
-        end
-      end
-      
-      # Если не получилось из body, пробуем params (на случай если Rails распарсил)
-      if data.nil? && (params[:message] || params['message'] || params[:callback_query] || params['callback_query'])
-        Rails.logger.info "Data found in params (fallback)"
-        data = params.to_unsafe_h
-      end
-      
-      Rails.logger.info "Data keys: #{data&.keys&.inspect}"
-      
-      # Получаем message или callback_query
-      message = data&.[](:message) || data&.[]('message')
-      callback_query = data&.[](:callback_query) || data&.[]('callback_query')
+      # Telegram обычно кладет payload в корень, без вложения в имя контроллера.
+      message        = data["message"]        || data[:message]
+      callback_query = data["callback_query"] || data[:callback_query]
       
       if message
-        chat = message[:chat] || message['chat'] || {}
-        chat_id = chat[:id] || chat['id']
-        text = message[:text] || message['text']
+        chat = message["chat"] || message[:chat] || {}
+        chat_id = chat["id"] || chat[:id]
+        text = message["text"] || message[:text]
         
         Rails.logger.info "Message received - chat_id: #{chat_id}, text: #{text.inspect}"
         
@@ -108,7 +85,7 @@ class TelegramWebhookController < ApplicationController
         end
       elsif callback_query
         Rails.logger.info "Callback query received"
-        callback_id = callback_query[:id] || callback_query['id']
+        callback_id = callback_query["id"] || callback_query[:id]
         answer_callback_query(callback_id) if callback_id
       else
         Rails.logger.warn "No message or callback_query. Full data: #{data.inspect}"
