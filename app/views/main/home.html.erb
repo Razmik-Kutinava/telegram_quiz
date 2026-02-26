@@ -967,14 +967,14 @@
                         ? resultTitleEl.textContent.replace('Ты — ', '').trim()
                         : '';
 
-                    // Короткая ссылка для шеринга
-                    const shortUrl = 'https://clc.li/rhQbZ';
+                    // Прямой URL на Mini App (для перехода в бота)
+                    const botUrl = '<%= ENV["TELEGRAM_WEB_APP_URL"] || "https://telegram-quiz-sirr.onrender.com" %>?startapp=share';
 
                     // Текст для шеринга со ссылкой внизу (без превью):
                     // Я — {коктейль} 🍹
                     // А ты какой?
                     // {ссылка}
-                    const shareText = `Я — ${resultName} 🍹\nА ты какой?\n\n${shortUrl}`;
+                    const shareText = `Я — ${resultName} 🍹\nА ты какой?\n\n${botUrl}`;
 
                     // Формируем URL для шеринга через Telegram
                     // Используем только параметр text (без url), чтобы не было превью
@@ -1004,8 +1004,8 @@
                     console.error('Ошибка при шеринге:', err);
                     // Fallback: копируем ссылку в буфер обмена
                     try {
-                        const shortUrl = 'https://clc.li/rhQbZ';
-                        await navigator.clipboard.writeText(shortUrl);
+                        const fallbackUrl = '<%= ENV["TELEGRAM_WEB_APP_URL"] || "https://telegram-quiz-sirr.onrender.com" %>?startapp=share';
+                        await navigator.clipboard.writeText(fallbackUrl);
                         showScene(7);
                     } catch (clipErr) {
                         alert('Не удалось поделиться. Попробуйте еще раз.');
