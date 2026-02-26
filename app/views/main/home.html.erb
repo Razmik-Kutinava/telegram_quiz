@@ -607,14 +607,6 @@
                     <p class="subhead" id="resultDesc" style="max-width: 280px;">Описание</p>
                 </div>
 
-                <!-- Bonus Card -->
-                <div class="bonus-card" style="margin-top: 20px; margin-bottom: -7px;">
-                    <div class="bonus-title">Весенний бонус</div>
-                    <div class="promo-code" id="promo-code">SPRINGNAPI</div>
-                    <div class="promo-valid">Действует до 31 марта</div>
-                    <div class="promo-helper">Покажи этот экран в баре</div>
-                </div>
-
                 <!-- Buttons -->
                 <div class="button-container" style="margin-top: 0;">
                     <div class="button-row">
@@ -971,11 +963,10 @@
             document.getElementById('shareResultBtn').addEventListener('click', async () => {
                 try {
                     const resultName = document.getElementById('resultTitle').textContent.replace('Ты — ', '');
-                    const promoCode = document.getElementById('promo-code')?.textContent?.trim() || 'SPRINGNAPI';
                     const shareUrl = '<%= ENV["TELEGRAM_WEB_APP_URL"] || "https://t.me/your_bot" %>';
 
                     // Формируем текст для шеринга
-                    const shareText = `🍹 Я прошёл весенний квиз НАПИ:БАР!\n\nМой коктейль: ${resultName}\n\nПройди квиз и получи промокод ${promoCode} на скидку!`;
+                    const shareText = `🍹 Я прошёл весенний квиз НАПИ:БАР!\n\nМой коктейль: ${resultName}\n\nПройди квиз и узнай свой вкус!`;
 
                     // Проверяем, запущено ли приложение в Telegram
                     if (window.Telegram && window.Telegram.WebApp) {
