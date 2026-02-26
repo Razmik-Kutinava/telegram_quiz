@@ -23,5 +23,8 @@ module TelegramQuiz
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    
+    # Добавляем middleware для логирования всех запросов
+    config.middleware.use RequestLogger
   end
 end

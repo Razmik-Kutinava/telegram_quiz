@@ -77,4 +77,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server - Puma will use PORT from environment (configured in config/puma.rb)
 # Render automatically sets PORT environment variable
-CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
+CMD ["sh", "-c", "./bin/rails server -b 0.0.0.0 -p ${PORT:-3000}"]

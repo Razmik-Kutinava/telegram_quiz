@@ -19,4 +19,6 @@ services:
         value: true
       - key: RAILS_SERVE_STATIC_FILES
         value: true
+      - key: PORT
+        value: "3000"
     healthCheckPath: /up
