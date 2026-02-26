@@ -107,8 +107,8 @@ class TelegramWebhookController < ApplicationController
           web_app_url = ENV['TELEGRAM_WEB_APP_URL'] || 'https://telegram-quiz-sirr.onrender.com'
           send_message_with_button(
             chat_id,
-            "Привет! 🍹\n\nУзнай, какой ты коктейль этой весной!",
-            "Открыть квиз",
+            "Весенний квиз\nНАПИ:БАР\nУзнай свой вкус и\nполучи -10% на\nсезонное меню до 31\nмарта",
+            "Пройти квиз",
             web_app_url
           )
         end
