@@ -45,21 +45,30 @@ class TelegramWebhookController < ApplicationController
   
   # Endpoint для проверки переменных окружения (только для диагностики)
   def check_env
-    token_set = ENV['TELEGRAM_BOT_TOKEN'].present?
-    token_length = ENV['TELEGRAM_BOT_TOKEN']&.length || 0
+    token = ENV['TELEGRAM_BOT_TOKEN'] || ENV['TELEGRAM_TOKEN']
+    token_source = if ENV['TELEGRAM_BOT_TOKEN'].present?
+                     'TELEGRAM_BOT_TOKEN'
+                   elsif ENV['TELEGRAM_TOKEN'].present?
+                     'TELEGRAM_TOKEN'
+                   else
+                     'NONE'
+                   end
+    token_set = token.present?
+    token_length = token&.length || 0
     web_app_url = ENV['TELEGRAM_WEB_APP_URL']
-    
+
     $stdout.puts "=== ENV CHECK ==="
-    $stdout.puts "TELEGRAM_BOT_TOKEN set: #{token_set}"
-    $stdout.puts "TELEGRAM_BOT_TOKEN length: #{token_length}"
+    $stdout.puts "Token found via: #{token_source}"
+    $stdout.puts "Token set: #{token_set}, length: #{token_length}"
     $stdout.puts "TELEGRAM_WEB_APP_URL: #{web_app_url}"
     $stdout.flush
-    
-    render json: { 
-      token_set: token_set, 
+
+    render json: {
+      token_set: token_set,
+      token_source: token_source,
       token_length: token_length,
       web_app_url: web_app_url,
-      token_preview: token_set ? "#{ENV['TELEGRAM_BOT_TOKEN'][0..10]}..." : nil
+      token_preview: token_set ? "#{token[0..10]}..." : nil
     }
   end
   
@@ -120,51 +129,60 @@ class TelegramWebhookController < ApplicationController
   end
   
   private
-  
-  def send_message(chat_id, text)
-    bot_token = ENV['TELEGRAM_BOT_TOKEN']
-    unless bot_token
-      Rails.logger.error "TELEGRAM_BOT_TOKEN not set!"
-      return
+
+  def bot_token
+    token = ENV['TELEGRAM_BOT_TOKEN'] || ENV['TELEGRAM_TOKEN']
+    unless token
+      $stdout.puts "[ERROR] Bot token not found! Neither TELEGRAM_BOT_TOKEN nor TELEGRAM_TOKEN is set!"
+      $stdout.flush
+      Rails.logger.error "Bot token not found! Neither TELEGRAM_BOT_TOKEN nor TELEGRAM_TOKEN is set!"
     end
-    
+    token
+  end
+
+  def send_message(chat_id, text)
+    return unless bot_token
+
+    $stdout.puts "[SEND] Sending message to chat_id=#{chat_id}"
+    $stdout.flush
     Rails.logger.info "Sending message to chat_id=#{chat_id}, text=#{text}"
-    
+
     uri = URI("https://api.telegram.org/bot#{bot_token}/sendMessage")
-    
-    payload = {
-      chat_id: chat_id,
-      text: text
-    }
-    
+
+    payload = { chat_id: chat_id, text: text }
+
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     request = Net::HTTP::Post.new(uri.path)
     request['Content-Type'] = 'application/json'
     request.body = payload.to_json
-    
+
     response = http.request(request)
+    $stdout.puts "[SEND] Telegram API response: #{response.code}"
+    $stdout.flush
     Rails.logger.info "Telegram API response: #{response.code} #{response.body}"
-    
+
     unless response.code.to_i == 200
+      $stdout.puts "[ERROR] Failed to send message: #{response.body}"
+      $stdout.flush
       Rails.logger.error "Failed to send message: #{response.body}"
     end
   rescue => e
+    $stdout.puts "[ERROR] Error sending message: #{e.message}"
+    $stdout.flush
     Rails.logger.error "Error sending message: #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
   end
-  
+
   def send_message_with_button(chat_id, text, button_text, web_app_url)
-    bot_token = ENV['TELEGRAM_BOT_TOKEN']
-    unless bot_token
-      Rails.logger.error "TELEGRAM_BOT_TOKEN not set!"
-      return
-    end
-    
+    return unless bot_token
+
+    $stdout.puts "[SEND] Sending message with button to chat_id=#{chat_id}"
+    $stdout.flush
     Rails.logger.info "Sending message with button to chat_id=#{chat_id}, web_app_url=#{web_app_url}"
-    
+
     uri = URI("https://api.telegram.org/bot#{bot_token}/sendMessage")
-    
+
     payload = {
       chat_id: chat_id,
       text: text,
@@ -174,40 +192,43 @@ class TelegramWebhookController < ApplicationController
           [
             {
               text: button_text,
-              web_app: {
-                url: web_app_url
-              }
+              web_app: { url: web_app_url }
             }
           ]
         ]
       }
     }
-    
+
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     request = Net::HTTP::Post.new(uri.path)
     request['Content-Type'] = 'application/json'
     request.body = payload.to_json
-    
+
     response = http.request(request)
+    $stdout.puts "[SEND] Telegram API response (button): #{response.code}"
+    $stdout.flush
     Rails.logger.info "Telegram API response (button): #{response.code} #{response.body}"
-    
+
     unless response.code.to_i == 200
+      $stdout.puts "[ERROR] Failed to send button message: #{response.body}"
+      $stdout.flush
       Rails.logger.error "Failed to send message with button: #{response.body}"
     end
   rescue => e
+    $stdout.puts "[ERROR] Error sending message with button: #{e.message}"
+    $stdout.flush
     Rails.logger.error "Error sending message with button: #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
   end
-  
+
   def answer_callback_query(callback_query_id, text = nil)
-    bot_token = ENV['TELEGRAM_BOT_TOKEN']
     return unless bot_token
-    
+
     uri = URI("https://api.telegram.org/bot#{bot_token}/answerCallbackQuery")
     params = { callback_query_id: callback_query_id }
     params[:text] = text if text
-    
+
     Net::HTTP.post_form(uri, params)
   rescue => e
     Rails.logger.error "Error answering callback query: #{e.message}"

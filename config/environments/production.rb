@@ -93,9 +93,8 @@ Rails.application.configure do
   # Skip DNS rebinding protection for the default health check endpoint and webhook endpoints.
   config.host_authorization = { 
     exclude: ->(request) { 
-      request.path == "/up" || 
-      request.path == "/telegram/webhook" || 
-      request.path == "/telegram/test" 
+      request.path == "/up" ||
+      request.path.start_with?("/telegram/") 
     } 
   }
 end
