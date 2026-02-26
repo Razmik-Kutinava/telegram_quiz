@@ -9,32 +9,44 @@ class TelegramWebhookController < ApplicationController
   before_action :log_request
   
   def log_request
-    STDOUT.puts "=" * 80
-    STDOUT.puts "[CONTROLLER] #{request.method} #{request.path}"
-    STDOUT.puts "[CONTROLLER] Time: #{Time.current}"
-    STDOUT.puts "[CONTROLLER] Action: #{action_name}"
-    STDOUT.puts "[CONTROLLER] Remote IP: #{request.remote_ip}"
-    STDOUT.puts "[CONTROLLER] User-Agent: #{request.user_agent}"
-    STDOUT.flush
+    # Принудительно выводим в STDOUT с немедленным flush
+    $stdout.puts "=" * 80
+    $stdout.puts "[CONTROLLER] #{request.method} #{request.path}"
+    $stdout.puts "[CONTROLLER] Time: #{Time.current}"
+    $stdout.puts "[CONTROLLER] Action: #{action_name}"
+    $stdout.puts "[CONTROLLER] Remote IP: #{request.remote_ip}"
+    $stdout.puts "[CONTROLLER] User-Agent: #{request.user_agent}"
+    $stdout.flush
     
+    # Также используем Rails.logger
     Rails.logger.info "=" * 80
     Rails.logger.info "[CONTROLLER] #{request.method} #{request.path}"
     Rails.logger.info "[CONTROLLER] Time: #{Time.current}"
     Rails.logger.info "[CONTROLLER] Action: #{action_name}"
     Rails.logger.info "[CONTROLLER] Remote IP: #{request.remote_ip}"
+    Rails.logger.info "[CONTROLLER] User-Agent: #{request.user_agent}"
   end
   
   # Тестовый endpoint для проверки POST запросов
   def test
+    $stdout.puts "=== TEST ENDPOINT CALLED ==="
+    $stdout.puts "Method: #{request.method}"
+    body_content = request.body.read
+    request.body.rewind
+    $stdout.puts "Body: #{body_content}"
+    $stdout.flush
+    
     Rails.logger.info "=== TEST ENDPOINT CALLED ==="
     Rails.logger.info "Method: #{request.method}"
-    Rails.logger.info "Body: #{request.body.read}"
-    request.body.rewind
+    Rails.logger.info "Body: #{body_content}"
+    
     render json: { status: "ok", message: "POST works!", method: request.method }
   end
   
   def webhook
     # Логируем что пришло - ВСЕГДА (в самом начале, до любых проверок)
+    $stdout.puts "=== WEBHOOK CALLED ==="
+    $stdout.flush
     Rails.logger.info "=== WEBHOOK CALLED ==="
     Rails.logger.info "Time: #{Time.current}"
     Rails.logger.info "Method: #{request.method}"
