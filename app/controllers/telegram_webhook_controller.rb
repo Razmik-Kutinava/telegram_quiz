@@ -3,7 +3,7 @@ require 'uri'
 require 'json'
 
 class TelegramWebhookController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:webhook, :test]
+  skip_before_action :verify_authenticity_token, only: [:webhook, :test, :check_env]
   
   # Логируем ВСЕ запросы к этому контроллеру
   before_action :log_request
@@ -41,6 +41,26 @@ class TelegramWebhookController < ApplicationController
     Rails.logger.info "Body: #{body_content}"
     
     render json: { status: "ok", message: "POST works!", method: request.method }
+  end
+  
+  # Endpoint для проверки переменных окружения (только для диагностики)
+  def check_env
+    token_set = ENV['TELEGRAM_BOT_TOKEN'].present?
+    token_length = ENV['TELEGRAM_BOT_TOKEN']&.length || 0
+    web_app_url = ENV['TELEGRAM_WEB_APP_URL']
+    
+    $stdout.puts "=== ENV CHECK ==="
+    $stdout.puts "TELEGRAM_BOT_TOKEN set: #{token_set}"
+    $stdout.puts "TELEGRAM_BOT_TOKEN length: #{token_length}"
+    $stdout.puts "TELEGRAM_WEB_APP_URL: #{web_app_url}"
+    $stdout.flush
+    
+    render json: { 
+      token_set: token_set, 
+      token_length: token_length,
+      web_app_url: web_app_url,
+      token_preview: token_set ? "#{ENV['TELEGRAM_BOT_TOKEN'][0..10]}..." : nil
+    }
   end
   
   def webhook
