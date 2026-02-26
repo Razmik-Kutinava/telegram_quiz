@@ -25,6 +25,7 @@ module TelegramQuiz
     # config.eager_load_paths << Rails.root.join("extras")
     
     # Добавляем middleware для логирования всех запросов
+    require_relative '../lib/request_logger'
     config.middleware.use RequestLogger
   end
 end
