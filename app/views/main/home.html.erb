@@ -595,7 +595,7 @@
 
         <!-- СЦЕНА 6: РЕЗУЛЬТАТ (FINAL DESIGN) -->
         <div class="scene centered" id="scene6">
-            <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; width: 100%; padding-top: 40px;">
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; width: 100%; padding-top: 40px; gap: 24px;">
                 <!-- Avatar + Result -->
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
                     <div class="avatar-circle" style="margin-bottom: 8px;">
@@ -608,7 +608,7 @@
                 </div>
 
                 <!-- Buttons -->
-                <div class="button-container" style="margin-top: 0;">
+                <div class="button-container" style="margin-top: 0; margin-bottom: 8px;">
                     <div class="button-row">
                         <button class="button-large btn-primary" id="shareResultBtn">
                             Поделиться в Telegram
@@ -962,33 +962,31 @@
 
             document.getElementById('shareResultBtn').addEventListener('click', async () => {
                 try {
-                    const resultName = document.getElementById('resultTitle').textContent.replace('Ты — ', '');
+                    const resultTitleEl = document.getElementById('resultTitle');
+                    const resultName = resultTitleEl
+                        ? resultTitleEl.textContent.replace('Ты — ', '').trim()
+                        : '';
                     const shareUrl = '<%= ENV["TELEGRAM_WEB_APP_URL"] || "https://t.me/your_bot" %>';
+                    const fullShareUrl = `${shareUrl}?startapp=share`;
 
-                    // Формируем текст для шеринга
-                    const shareText = `🍹 Я прошёл весенний квиз НАПИ:БАР!\n\nМой коктейль: ${resultName}\n\nПройди квиз и узнай свой вкус!`;
+                    // Новый текст для шеринга:
+                    // Я — {коктейль} 🍹
+                    // А ты какой?
+                    //
+                    // {ссылка}
+                    const shareText = `Я — ${resultName} 🍹\nА ты какой?\n\n${fullShareUrl}`;
 
                     // Проверяем, запущено ли приложение в Telegram
                     if (window.Telegram && window.Telegram.WebApp) {
                         const tg = window.Telegram.WebApp;
 
-                        // Используем Telegram API для шеринга
-                        // Открываем стандартное окно шеринга Telegram
-                        const fullShareUrl = `${shareUrl}?startapp=share`;
-                        const fullText = `${shareText}\n\n${fullShareUrl}`;
-
-                        // Если доступен метод shareToStory (Telegram 7.0+)
-                        if (tg.shareToStory) {
-                            // Можно поделиться в story, но это требует медиа
-                            // Пока используем обычный шеринг
-                        }
-
-                        // Используем openTelegramLink для открытия диалога шеринга
-                        const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(fullShareUrl)}&text=${encodeURIComponent(shareText)}`;
+                        const telegramShareUrl =
+                            `https://t.me/share/url?url=${encodeURIComponent(fullShareUrl)}&text=${encodeURIComponent(shareText)}`;
                         tg.openTelegramLink(telegramShareUrl);
                     } else {
                         // Fallback: Используем Telegram Share URL если не в WebApp
-                        const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+                        const telegramShareUrl =
+                            `https://t.me/share/url?url=${encodeURIComponent(fullShareUrl)}&text=${encodeURIComponent(shareText)}`;
                         window.open(telegramShareUrl, '_blank');
                     }
 
