@@ -5,6 +5,25 @@ require 'json'
 class TelegramWebhookController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:webhook, :test]
   
+  # Логируем ВСЕ запросы к этому контроллеру
+  before_action :log_request
+  
+  def log_request
+    STDOUT.puts "=" * 80
+    STDOUT.puts "[CONTROLLER] #{request.method} #{request.path}"
+    STDOUT.puts "[CONTROLLER] Time: #{Time.current}"
+    STDOUT.puts "[CONTROLLER] Action: #{action_name}"
+    STDOUT.puts "[CONTROLLER] Remote IP: #{request.remote_ip}"
+    STDOUT.puts "[CONTROLLER] User-Agent: #{request.user_agent}"
+    STDOUT.flush
+    
+    Rails.logger.info "=" * 80
+    Rails.logger.info "[CONTROLLER] #{request.method} #{request.path}"
+    Rails.logger.info "[CONTROLLER] Time: #{Time.current}"
+    Rails.logger.info "[CONTROLLER] Action: #{action_name}"
+    Rails.logger.info "[CONTROLLER] Remote IP: #{request.remote_ip}"
+  end
+  
   # Тестовый endpoint для проверки POST запросов
   def test
     Rails.logger.info "=== TEST ENDPOINT CALLED ==="
