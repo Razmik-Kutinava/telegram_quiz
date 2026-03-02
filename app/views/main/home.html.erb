@@ -967,13 +967,13 @@
                         ? resultTitleEl.textContent.replace('Ты — ', '').trim()
                         : '';
 
-                    // Прямой URL на Mini App (для перехода в бота)
-                    const botUrl = '<%= ENV["TELEGRAM_WEB_APP_URL"] || "https://telegram-quiz-sirr.onrender.com" %>?startapp=share';
+                    // Прямой URL на бота (при нажатии кнопки открывается бот)
+                    const botUrl = 'https://t.me/springbonus_bot';
 
                     // Текст для шеринга (без ссылок, только текст):
                     // Я — {коктейль} 🍹
-                    // А ты какой?
-                    const shareText = `Я — ${resultName} 🍹\nА ты какой?`;
+                    // А ты какой? Пройти квиз: @springbonus_bot
+                    const shareText = `Я — ${resultName} 🍹\nА ты какой? Пройти квиз: @springbonus_bot`;
 
                     // Формируем URL для шеринга через Telegram
                     // Параметр url создаст превью-карточку с кнопкой "Открыть" для перехода в бота
@@ -995,9 +995,9 @@
                     showScene(7);
                 } catch (err) {
                     console.error('Ошибка при шеринге:', err);
-                    // Fallback: копируем ссылку в буфер обмена
+                    // Fallback: копируем ссылку на бота в буфер обмена
                     try {
-                        const fallbackUrl = '<%= ENV["TELEGRAM_WEB_APP_URL"] || "https://telegram-quiz-sirr.onrender.com" %>?startapp=share';
+                        const fallbackUrl = 'https://t.me/springbonus_bot';
                         await navigator.clipboard.writeText(fallbackUrl);
                         showScene(7);
                     } catch (clipErr) {
