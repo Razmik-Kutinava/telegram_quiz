@@ -105,6 +105,10 @@ class TelegramWebhookController < ApplicationController
         if text == '/start' || text&.start_with?('/start')
           Rails.logger.info "Processing /start command"
           web_app_url = ENV['TELEGRAM_WEB_APP_URL'] || 'https://telegram-quiz-sirr.onrender.com'
+          
+          # Получаем URL логотипа
+          base_url = ENV['TELEGRAM_WEB_APP_URL'] || request.base_url
+          logo_url = "#{base_url}/logo/logo.jpg"
 
           fancy_text =
             "🌸 <b>Весенний квиз · НАПИ:БАР</b> 🌸\n\n" \
@@ -112,6 +116,10 @@ class TelegramWebhookController < ApplicationController
             "до <b>31 марта</b> в нашем баре.\n\n" \
             "Нажми <b>«Пройти квиз»</b>, чтобы начать весну ярко. 🍹"
 
+          # Сначала отправляем фото с логотипом
+          send_photo(chat_id, logo_url)
+          
+          # Затем отправляем текст с кнопкой
           send_message_with_button(
             chat_id,
             fancy_text,
@@ -226,6 +234,44 @@ class TelegramWebhookController < ApplicationController
     $stdout.puts "[ERROR] Error sending message with button: #{e.message}"
     $stdout.flush
     Rails.logger.error "Error sending message with button: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+  end
+
+  def send_photo(chat_id, photo_url, caption = nil)
+    return unless bot_token
+
+    $stdout.puts "[SEND] Sending photo to chat_id=#{chat_id}, url=#{photo_url}"
+    $stdout.flush
+    Rails.logger.info "Sending photo to chat_id=#{chat_id}, url=#{photo_url}"
+
+    uri = URI("https://api.telegram.org/bot#{bot_token}/sendPhoto")
+
+    payload = {
+      chat_id: chat_id,
+      photo: photo_url
+    }
+    payload[:caption] = caption if caption
+
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    request = Net::HTTP::Post.new(uri.path)
+    request['Content-Type'] = 'application/json'
+    request.body = payload.to_json
+
+    response = http.request(request)
+    $stdout.puts "[SEND] Telegram API response (photo): #{response.code}"
+    $stdout.flush
+    Rails.logger.info "Telegram API response (photo): #{response.code} #{response.body}"
+
+    unless response.code.to_i == 200
+      $stdout.puts "[ERROR] Failed to send photo: #{response.body}"
+      $stdout.flush
+      Rails.logger.error "Failed to send photo: #{response.body}"
+    end
+  rescue => e
+    $stdout.puts "[ERROR] Error sending photo: #{e.message}"
+    $stdout.flush
+    Rails.logger.error "Error sending photo: #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
   end
 
