@@ -168,22 +168,31 @@ class TelegramWebhookController < ApplicationController
               $stdout.flush
 
               begin
-                send_photo_with_caption_and_button(
+                success = send_photo_with_caption_and_button(
                   chat_id,
                   logo_path,
                   fancy_text,
                   "Пройти квиз",
                   web_app_url
                 )
-                Rails.logger.info "Photo with caption and button sent successfully"
-                $stdout.puts "[SUCCESS] Photo with caption and button sent successfully"
-                $stdout.flush
+                unless success
+                  Rails.logger.warn "send_photo_with_caption_and_button returned false, falling back to text message"
+                  $stdout.puts "[WARN] send_photo_with_caption_and_button returned false, falling back to text message"
+                  $stdout.flush
+                  send_message_with_button(chat_id, fancy_text, "Пройти квиз", web_app_url)
+                else
+                  Rails.logger.info "Photo with caption and button sent successfully"
+                  $stdout.puts "[SUCCESS] Photo with caption and button sent successfully"
+                  $stdout.flush
+                end
               rescue => e
                 Rails.logger.error "Failed to send photo with caption and button: #{e.message}"
                 Rails.logger.error e.backtrace.join("\n")
                 $stdout.puts "[ERROR] Failed to send photo with caption and button: #{e.message}"
                 $stdout.puts "[ERROR] Backtrace: #{e.backtrace.first(5).join("\n")}"
                 $stdout.flush
+                # fallback to text message so user still sees something
+                send_message_with_button(chat_id, fancy_text, "Пройти квиз", web_app_url)
               end
             else
               Rails.logger.warn "Logo file not found at #{logo_path}, sending text only"
