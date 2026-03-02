@@ -114,63 +114,62 @@ class TelegramWebhookController < ApplicationController
             Rails.logger.error "ERROR: chat_id is nil! Cannot send message."
             $stdout.puts "[ERROR] chat_id is nil! Cannot send message."
             $stdout.flush
-            next
-          end
-          
-          web_app_url = ENV['TELEGRAM_WEB_APP_URL'] || 'https://telegram-quiz-sirr.onrender.com'
+          else
+            web_app_url = ENV['TELEGRAM_WEB_APP_URL'] || 'https://telegram-quiz-sirr.onrender.com'
 
-          fancy_text =
-            "🌸 <b>Весенний квиз · НАПИ:БАР</b> 🌸\n\n" \
-            "Узнай свой весенний вкус и получи <b>-10% на сезонное меню</b>\n" \
-            "до <b>31 марта</b> в нашем баре.\n\n" \
-            "Нажми <b>«Пройти квиз»</b>, чтобы начать весну ярко. 🍹"
+            fancy_text =
+              "🌸 <b>Весенний квиз · НАПИ:БАР</b> 🌸\n\n" \
+              "Узнай свой весенний вкус и получи <b>-10% на сезонное меню</b>\n" \
+              "до <b>31 марта</b> в нашем баре.\n\n" \
+              "Нажми <b>«Пройти квиз»</b>, чтобы начать весну ярко. 🍹"
 
-          # Путь к логотипу
-          logo_path = Rails.root.join('public', 'logo', 'logo.jpg')
-          
-          # СНАЧАЛА отправляем текст с кнопкой (гарантированно работает)
-          Rails.logger.info "Attempting to send message with button to chat_id: #{chat_id}"
-          $stdout.puts "[DEBUG] Attempting to send message with button to chat_id: #{chat_id}"
-          $stdout.flush
-          
-          begin
-            send_message_with_button(
-              chat_id,
-              fancy_text,
-              "Пройти квиз",
-              web_app_url
-            )
-            Rails.logger.info "Message with button sent successfully"
-            $stdout.puts "[SUCCESS] Message with button sent successfully"
+            # Путь к логотипу
+            logo_path = Rails.root.join('public', 'logo', 'logo.jpg')
+            
+            # СНАЧАЛА отправляем текст с кнопкой (гарантированно работает)
+            Rails.logger.info "Attempting to send message with button to chat_id: #{chat_id}"
+            $stdout.puts "[DEBUG] Attempting to send message with button to chat_id: #{chat_id}"
             $stdout.flush
-          rescue => e
-            Rails.logger.error "Failed to send message with button: #{e.message}"
-            Rails.logger.error e.backtrace.join("\n")
-            $stdout.puts "[ERROR] Failed to send message: #{e.message}"
-            $stdout.puts "[ERROR] Backtrace: #{e.backtrace.first(5).join("\n")}"
-            $stdout.flush
-          end
-          
-          # ПОТОМ пытаемся отправить фото отдельно
-          if File.exist?(logo_path)
-            Rails.logger.info "Attempting to send photo to chat_id: #{chat_id}"
-            $stdout.puts "[DEBUG] Attempting to send photo to chat_id: #{chat_id}"
-            $stdout.flush
+            
             begin
-              send_photo_simple(chat_id, logo_path)
-              Rails.logger.info "Photo sent successfully"
-              $stdout.puts "[SUCCESS] Photo sent successfully"
+              send_message_with_button(
+                chat_id,
+                fancy_text,
+                "Пройти квиз",
+                web_app_url
+              )
+              Rails.logger.info "Message with button sent successfully"
+              $stdout.puts "[SUCCESS] Message with button sent successfully"
               $stdout.flush
             rescue => e
-              Rails.logger.error "Failed to send photo: #{e.message}"
+              Rails.logger.error "Failed to send message with button: #{e.message}"
               Rails.logger.error e.backtrace.join("\n")
-              $stdout.puts "[ERROR] Photo send failed: #{e.message}"
+              $stdout.puts "[ERROR] Failed to send message: #{e.message}"
+              $stdout.puts "[ERROR] Backtrace: #{e.backtrace.first(5).join("\n")}"
               $stdout.flush
             end
-          else
-            Rails.logger.warn "Logo file not found at #{logo_path}"
-            $stdout.puts "[WARN] Logo file not found at #{logo_path}"
-            $stdout.flush
+            
+            # ПОТОМ пытаемся отправить фото отдельно
+            if File.exist?(logo_path)
+              Rails.logger.info "Attempting to send photo to chat_id: #{chat_id}"
+              $stdout.puts "[DEBUG] Attempting to send photo to chat_id: #{chat_id}"
+              $stdout.flush
+              begin
+                send_photo_simple(chat_id, logo_path)
+                Rails.logger.info "Photo sent successfully"
+                $stdout.puts "[SUCCESS] Photo sent successfully"
+                $stdout.flush
+              rescue => e
+                Rails.logger.error "Failed to send photo: #{e.message}"
+                Rails.logger.error e.backtrace.join("\n")
+                $stdout.puts "[ERROR] Photo send failed: #{e.message}"
+                $stdout.flush
+              end
+            else
+              Rails.logger.warn "Logo file not found at #{logo_path}"
+              $stdout.puts "[WARN] Logo file not found at #{logo_path}"
+              $stdout.flush
+            end
           end
         end
       elsif callback_query
