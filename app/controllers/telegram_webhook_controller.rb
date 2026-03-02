@@ -379,31 +379,33 @@ class TelegramWebhookController < ApplicationController
     }.to_json
 
     # Формируем body правильно для бинарных данных
-    body = String.new.force_encoding('BINARY')
+    body = ''.b
 
-    body << "--#{boundary}\r\n"
-    body << "Content-Disposition: form-data; name=\"chat_id\"\r\n\r\n"
-    body << "#{chat_id}\r\n"
+    body << "--#{boundary}\r\n".b
+    body << "Content-Disposition: form-data; name=\"chat_id\"\r\n\r\n".b
+    body << "#{chat_id}\r\n".to_s.b
 
-    body << "--#{boundary}\r\n"
-    body << "Content-Disposition: form-data; name=\"caption\"\r\n\r\n"
-    body << "#{caption}\r\n"
+    body << "--#{boundary}\r\n".b
+    body << "Content-Disposition: form-data; name=\"caption\"\r\n\r\n".b
+    body << caption.to_s.b
+    body << "\r\n".b
 
-    body << "--#{boundary}\r\n"
-    body << "Content-Disposition: form-data; name=\"parse_mode\"\r\n\r\n"
-    body << "HTML\r\n"
+    body << "--#{boundary}\r\n".b
+    body << "Content-Disposition: form-data; name=\"parse_mode\"\r\n\r\n".b
+    body << "HTML\r\n".b
 
-    body << "--#{boundary}\r\n"
-    body << "Content-Disposition: form-data; name=\"reply_markup\"\r\n\r\n"
-    body << "#{reply_markup}\r\n"
+    body << "--#{boundary}\r\n".b
+    body << "Content-Disposition: form-data; name=\"reply_markup\"\r\n\r\n".b
+    body << reply_markup.to_s.b
+    body << "\r\n".b
 
-    body << "--#{boundary}\r\n"
-    body << "Content-Disposition: form-data; name=\"photo\"; filename=\"logo.jpg\"\r\n"
-    body << "Content-Type: image/jpeg\r\n\r\n"
+    body << "--#{boundary}\r\n".b
+    body << "Content-Disposition: form-data; name=\"photo\"; filename=\"logo.jpg\"\r\n".b
+    body << "Content-Type: image/jpeg\r\n\r\n".b
     body << file_content
-    body << "\r\n"
+    body << "\r\n".b
 
-    body << "--#{boundary}--\r\n"
+    body << "--#{boundary}--\r\n".b
 
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -455,19 +457,19 @@ class TelegramWebhookController < ApplicationController
     file_content = File.binread(photo_path)
 
     # Формируем body правильно для бинарных данных - создаем бинарную строку сразу
-    body = String.new.force_encoding('BINARY')
+    body = ''.b
 
-    body << "--#{boundary}\r\n"
-    body << "Content-Disposition: form-data; name=\"chat_id\"\r\n\r\n"
-    body << "#{chat_id}\r\n"
+    body << "--#{boundary}\r\n".b
+    body << "Content-Disposition: form-data; name=\"chat_id\"\r\n\r\n".b
+    body << "#{chat_id}\r\n".to_s.b
 
-    body << "--#{boundary}\r\n"
-    body << "Content-Disposition: form-data; name=\"photo\"; filename=\"logo.jpg\"\r\n"
-    body << "Content-Type: image/jpeg\r\n\r\n"
+    body << "--#{boundary}\r\n".b
+    body << "Content-Disposition: form-data; name=\"photo\"; filename=\"logo.jpg\"\r\n".b
+    body << "Content-Type: image/jpeg\r\n\r\n".b
     body << file_content
-    body << "\r\n"
+    body << "\r\n".b
 
-    body << "--#{boundary}--\r\n"
+    body << "--#{boundary}--\r\n".b
 
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
