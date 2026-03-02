@@ -116,30 +116,37 @@ class TelegramWebhookController < ApplicationController
           # Путь к логотипу
           logo_path = Rails.root.join('public', 'logo', 'logo.jpg')
           
-          # Сначала пытаемся отправить фото с логотипом
+          # Пытаемся отправить фото с текстом в caption
           photo_sent = false
           if File.exist?(logo_path)
             begin
-              send_photo_file(chat_id, logo_path)
+              send_photo_with_caption_and_button(chat_id, logo_path, fancy_text, "Пройти квиз", web_app_url)
               photo_sent = true
             rescue => e
-              Rails.logger.error "Failed to send photo, will send text only: #{e.message}"
+              Rails.logger.error "Failed to send photo with text, will send text only: #{e.message}"
+              Rails.logger.error e.backtrace.join("\n")
               $stdout.puts "[ERROR] Photo send failed: #{e.message}"
               $stdout.flush
+              # Отправляем только текст если фото не отправилось
+              send_message_with_button(
+                chat_id,
+                fancy_text,
+                "Пройти квиз",
+                web_app_url
+              )
             end
           else
             Rails.logger.warn "Logo file not found at #{logo_path}"
             $stdout.puts "[WARN] Logo file not found at #{logo_path}"
             $stdout.flush
+            # Отправляем только текст если файла нет
+            send_message_with_button(
+              chat_id,
+              fancy_text,
+              "Пройти квиз",
+              web_app_url
+            )
           end
-          
-          # Всегда отправляем текст с кнопкой (даже если фото не отправилось)
-          send_message_with_button(
-            chat_id,
-            fancy_text,
-            "Пройти квиз",
-            web_app_url
-          )
         end
       elsif callback_query
         Rails.logger.info "Callback query received"
@@ -251,20 +258,37 @@ class TelegramWebhookController < ApplicationController
     Rails.logger.error e.backtrace.join("\n")
   end
 
-  def send_photo_file(chat_id, photo_path, caption = nil)
+  def send_photo_with_caption_and_button(chat_id, photo_path, caption, button_text, web_app_url)
     return unless bot_token
     return unless File.exist?(photo_path)
 
-    $stdout.puts "[SEND] Sending photo file to chat_id=#{chat_id}, path=#{photo_path}"
+    $stdout.puts "[SEND] Sending photo with caption and button to chat_id=#{chat_id}"
     $stdout.flush
-    Rails.logger.info "Sending photo file to chat_id=#{chat_id}, path=#{photo_path}"
+    Rails.logger.info "Sending photo with caption and button to chat_id=#{chat_id}"
 
     uri = URI("https://api.telegram.org/bot#{bot_token}/sendPhoto")
 
-    # Создаем multipart/form-data запрос вручную
+    # Создаем multipart/form-data запрос правильно
     boundary = "----WebKitFormBoundary#{SecureRandom.hex(16)}"
     
-    body = []
+    # reply_markup (кнопка)
+    reply_markup = {
+      inline_keyboard: [
+        [
+          {
+            text: button_text,
+            web_app: { url: web_app_url }
+          }
+        ]
+      ]
+    }.to_json
+    
+    # Читаем файл
+    file_content = File.binread(photo_path)
+    
+    # Формируем body правильно для бинарных данных
+    body = String.new.force_encoding('BINARY')
+    
     body << "--#{boundary}\r\n"
     body << "Content-Disposition: form-data; name=\"chat_id\"\r\n\r\n"
     body << "#{chat_id}\r\n"
@@ -272,16 +296,22 @@ class TelegramWebhookController < ApplicationController
     body << "--#{boundary}\r\n"
     body << "Content-Disposition: form-data; name=\"photo\"; filename=\"logo.jpg\"\r\n"
     body << "Content-Type: image/jpeg\r\n\r\n"
-    
-    file_content = File.binread(photo_path)
     body << file_content
     body << "\r\n"
     
-    if caption
-      body << "--#{boundary}\r\n"
-      body << "Content-Disposition: form-data; name=\"caption\"\r\n\r\n"
-      body << "#{caption}\r\n"
-    end
+    body << "--#{boundary}\r\n"
+    body << "Content-Disposition: form-data; name=\"caption\"\r\n\r\n"
+    body << caption.force_encoding('BINARY')
+    body << "\r\n"
+    
+    body << "--#{boundary}\r\n"
+    body << "Content-Disposition: form-data; name=\"parse_mode\"\r\n\r\n"
+    body << "HTML\r\n"
+    
+    body << "--#{boundary}\r\n"
+    body << "Content-Disposition: form-data; name=\"reply_markup\"\r\n\r\n"
+    body << reply_markup.force_encoding('BINARY')
+    body << "\r\n"
     
     body << "--#{boundary}--\r\n"
     
@@ -289,23 +319,23 @@ class TelegramWebhookController < ApplicationController
     http.use_ssl = true
     request = Net::HTTP::Post.new(uri.path)
     request['Content-Type'] = "multipart/form-data; boundary=#{boundary}"
-    request.body = body.join
+    request.body = body
 
     response = http.request(request)
-    $stdout.puts "[SEND] Telegram API response (photo): #{response.code}"
+    $stdout.puts "[SEND] Telegram API response (photo with button): #{response.code}"
     $stdout.flush
-    Rails.logger.info "Telegram API response (photo): #{response.code} #{response.body}"
+    Rails.logger.info "Telegram API response (photo with button): #{response.code} #{response.body}"
 
     unless response.code.to_i == 200
-      $stdout.puts "[ERROR] Failed to send photo: #{response.body}"
+      $stdout.puts "[ERROR] Failed to send photo with button: #{response.body}"
       $stdout.flush
-      Rails.logger.error "Failed to send photo: #{response.body}"
+      Rails.logger.error "Failed to send photo with button: #{response.body}"
       raise "Telegram API error: #{response.body}"
     end
   rescue => e
-    $stdout.puts "[ERROR] Error sending photo file: #{e.message}"
+    $stdout.puts "[ERROR] Error sending photo with button: #{e.message}"
     $stdout.flush
-    Rails.logger.error "Error sending photo file: #{e.message}"
+    Rails.logger.error "Error sending photo with button: #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
     raise
   end
