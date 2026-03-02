@@ -158,50 +158,8 @@ class TelegramWebhookController < ApplicationController
               "до <b>31 марта</b> в нашем баре.\n\n" \
               "Нажми <b>«Пройти квиз»</b>, чтобы начать весну ярко. 🍹"
 
-            # Путь к логотипу
-            logo_path = Rails.root.join('public', 'logo', 'logo.jpg')
-
-            # Отправляем ВСЕ в одном сообщении: фото + текст + кнопка
-            if File.exist?(logo_path)
-              Rails.logger.info "Attempting to send photo with caption and button to chat_id: #{chat_id}"
-              $stdout.puts "[DEBUG] Attempting to send photo with caption and button to chat_id: #{chat_id}"
-              $stdout.flush
-
-              begin
-                success = send_photo_with_caption_and_button(
-                  chat_id,
-                  logo_path,
-                  fancy_text,
-                  "Пройти квиз",
-                  web_app_url
-                )
-                unless success
-                  Rails.logger.warn "send_photo_with_caption_and_button returned false, falling back to text message"
-                  $stdout.puts "[WARN] send_photo_with_caption_and_button returned false, falling back to text message"
-                  $stdout.flush
-                  send_message_with_button(chat_id, fancy_text, "Пройти квиз", web_app_url)
-                else
-                  Rails.logger.info "Photo with caption and button sent successfully"
-                  $stdout.puts "[SUCCESS] Photo with caption and button sent successfully"
-                  $stdout.flush
-                end
-              rescue => e
-                Rails.logger.error "Failed to send photo with caption and button: #{e.message}"
-                Rails.logger.error e.backtrace.join("\n")
-                $stdout.puts "[ERROR] Failed to send photo with caption and button: #{e.message}"
-                $stdout.puts "[ERROR] Backtrace: #{e.backtrace.first(5).join("\n")}"
-                $stdout.flush
-                # fallback to text message so user still sees something
-                send_message_with_button(chat_id, fancy_text, "Пройти квиз", web_app_url)
-              end
-            else
-              Rails.logger.warn "Logo file not found at #{logo_path}, sending text only"
-              $stdout.puts "[WARN] Logo file not found at #{logo_path}, sending text only"
-              $stdout.flush
-
-              # Fallback: если нет фото, отправляем хотя бы текст с кнопкой
-              send_message_with_button(chat_id, fancy_text, "Пройти квиз", web_app_url)
-            end
+            # Раньше отправляли фото с логотипом, теперь текст только
+            send_message_with_button(chat_id, fancy_text, "Пройти квиз", web_app_url)
           end
         end
       elsif callback_query
