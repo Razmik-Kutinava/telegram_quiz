@@ -13,21 +13,26 @@ Rails.application.config.after_initialize do
   end
 
   if token.present?
-    begin
-      uri = URI("https://api.telegram.org/bot#{token}/setWebhook")
-      params = { url: webhook_url }
-      uri.query = URI.encode_www_form(params)
+    if webhook_url.present?
+      begin
+        uri = URI("https://api.telegram.org/bot#{token}/setWebhook")
+        params = { url: webhook_url }
+        uri.query = URI.encode_www_form(params)
 
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      request = Net::HTTP::Get.new(uri)
-      response = http.request(request)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        request = Net::HTTP::Get.new(uri)
+        response = http.request(request)
 
-      Rails.logger.info "Telegram webhook set response: #{response.code} #{response.body}"
-      $stdout.puts "[INIT] Telegram webhook set response: #{response.code} #{response.body}"
-    rescue => e
-      Rails.logger.error "Failed to set Telegram webhook: #{e.message}"
-      $stdout.puts "[INIT] Failed to set Telegram webhook: #{e.message}"
+        Rails.logger.info "Telegram webhook set response: #{response.code} #{response.body}"
+        $stdout.puts "[INIT] Telegram webhook set response: #{response.code} #{response.body}"
+      rescue => e
+        Rails.logger.error "Failed to set Telegram webhook: #{e.message}"
+        $stdout.puts "[INIT] Failed to set Telegram webhook: #{e.message}"
+      end
+    else
+      Rails.logger.warn "Webhook URL could not be determined; skipping setWebhook"
+      $stdout.puts "[INIT] Webhook URL could not be determined; skipping setWebhook"
     end
   else
     Rails.logger.warn "Telegram token missing, cannot set webhook in initializer"
