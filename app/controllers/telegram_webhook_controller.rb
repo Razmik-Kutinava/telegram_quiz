@@ -87,14 +87,49 @@ class TelegramWebhookController < ApplicationController
     Rails.logger.info "Params keys: #{params.keys.inspect}"
     
     begin
-      # Самый надежный вариант: используем только params, без ручного парсинга body.
-      # Rails уже распарсит JSON из Telegram, если Content-Type: application/json.
+      # Пробуем получить данные из params
       data = params.to_unsafe_h
-      Rails.logger.info "Data from params: #{data.inspect}"
+      
+      # Если params пустые или нет нужных ключей, пробуем распарсить body вручную
+      if data.empty? || (!data.key?("message") && !data.key?(:message) && !data.key?("callback_query") && !data.key?(:callback_query))
+        $stdout.puts "[DEBUG] Params empty or no message/callback_query, trying to parse body"
+        $stdout.flush
+        Rails.logger.info "Params empty or no message/callback_query, trying to parse body"
+        
+        body_content = request.body.read
+        request.body.rewind
+        
+        $stdout.puts "[DEBUG] Body content: #{body_content.inspect}"
+        $stdout.flush
+        Rails.logger.info "Body content: #{body_content.inspect}"
+        
+        if body_content.present?
+          begin
+            data = JSON.parse(body_content)
+            Rails.logger.info "Parsed JSON from body: #{data.inspect}"
+            $stdout.puts "[DEBUG] Parsed JSON from body: #{data.inspect}"
+            $stdout.flush
+          rescue JSON::ParserError => e
+            Rails.logger.error "Failed to parse JSON: #{e.message}"
+            $stdout.puts "[ERROR] Failed to parse JSON: #{e.message}"
+            $stdout.flush
+            data = {}
+          end
+        end
+      else
+        Rails.logger.info "Data from params: #{data.inspect}"
+        $stdout.puts "[DEBUG] Data from params: #{data.inspect}"
+        $stdout.flush
+      end
       
       # Telegram обычно кладет payload в корень, без вложения в имя контроллера.
       message        = data["message"]        || data[:message]
       callback_query = data["callback_query"] || data[:callback_query]
+      
+      $stdout.puts "[DEBUG] Message: #{message.inspect}"
+      $stdout.puts "[DEBUG] Callback query: #{callback_query.inspect}"
+      $stdout.flush
+      Rails.logger.info "Message: #{message.inspect}, Callback query: #{callback_query.inspect}"
       
       if message
         chat = message["chat"] || message[:chat] || {}
@@ -178,13 +213,20 @@ class TelegramWebhookController < ApplicationController
         answer_callback_query(callback_id) if callback_id
       else
         Rails.logger.warn "No message or callback_query. Full data: #{data.inspect}"
+        $stdout.puts "[WARN] No message or callback_query. Full data: #{data.inspect}"
+        $stdout.flush
       end
     rescue => e
       Rails.logger.error "EXCEPTION in webhook: #{e.class} - #{e.message}"
       Rails.logger.error e.backtrace.join("\n")
+      $stdout.puts "[ERROR] EXCEPTION in webhook: #{e.class} - #{e.message}"
+      $stdout.puts "[ERROR] Backtrace: #{e.backtrace.first(10).join("\n")}"
+      $stdout.flush
     end
     
     # ВСЕГДА возвращаем 200, чтобы Telegram не повторял запрос
+    $stdout.puts "[DEBUG] Returning 200 OK"
+    $stdout.flush
     head :ok
   end
   
