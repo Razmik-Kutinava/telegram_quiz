@@ -3,7 +3,8 @@
 
 Rails.application.config.after_initialize do
   token = ENV['TELEGRAM_BOT_TOKEN'] || ENV['TELEGRAM_TOKEN']
-  webhook_url = ENV['TELEGRAM_WEBHOOK_URL'] || "#{Rails.application.routes.url_helpers.root_url.chomp('/')}telegram/webhook"
+  # prefer explicit webhook URL, otherwise fall back to web app url or generated root
+  webhook_url = ENV['TELEGRAM_WEBHOOK_URL'] || (ENV['TELEGRAM_WEB_APP_URL'] ? "#{ENV['TELEGRAM_WEB_APP_URL'].chomp('/')}" : "#{Rails.application.routes.url_helpers.root_url.chomp('/')}") + "/telegram/webhook"
 
   if token.present?
     begin
