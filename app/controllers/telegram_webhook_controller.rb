@@ -144,7 +144,7 @@ class TelegramWebhookController < ApplicationController
           Rails.logger.info "Processing /start command for chat_id: #{chat_id}"
           $stdout.puts "[DEBUG] Processing /start command for chat_id: #{chat_id}"
           $stdout.flush
-          
+
           unless chat_id
             Rails.logger.error "ERROR: chat_id is nil! Cannot send message."
             $stdout.puts "[ERROR] chat_id is nil! Cannot send message."
@@ -160,50 +160,38 @@ class TelegramWebhookController < ApplicationController
 
             # Путь к логотипу
             logo_path = Rails.root.join('public', 'logo', 'logo.jpg')
-            
-            # СНАЧАЛА отправляем текст с кнопкой (гарантированно работает)
-            Rails.logger.info "Attempting to send message with button to chat_id: #{chat_id}"
-            $stdout.puts "[DEBUG] Attempting to send message with button to chat_id: #{chat_id}"
-            $stdout.flush
-            
-            begin
-              send_message_with_button(
-                chat_id,
-                fancy_text,
-                "Пройти квиз",
-                web_app_url
-              )
-              Rails.logger.info "Message with button sent successfully"
-              $stdout.puts "[SUCCESS] Message with button sent successfully"
-              $stdout.flush
-            rescue => e
-              Rails.logger.error "Failed to send message with button: #{e.message}"
-              Rails.logger.error e.backtrace.join("\n")
-              $stdout.puts "[ERROR] Failed to send message: #{e.message}"
-              $stdout.puts "[ERROR] Backtrace: #{e.backtrace.first(5).join("\n")}"
-              $stdout.flush
-            end
-            
-            # ПОТОМ пытаемся отправить фото отдельно
+
+            # Отправляем ВСЕ в одном сообщении: фото + текст + кнопка
             if File.exist?(logo_path)
-              Rails.logger.info "Attempting to send photo to chat_id: #{chat_id}"
-              $stdout.puts "[DEBUG] Attempting to send photo to chat_id: #{chat_id}"
+              Rails.logger.info "Attempting to send photo with caption and button to chat_id: #{chat_id}"
+              $stdout.puts "[DEBUG] Attempting to send photo with caption and button to chat_id: #{chat_id}"
               $stdout.flush
+
               begin
-                send_photo_simple(chat_id, logo_path)
-                Rails.logger.info "Photo sent successfully"
-                $stdout.puts "[SUCCESS] Photo sent successfully"
+                send_photo_with_caption_and_button(
+                  chat_id,
+                  logo_path,
+                  fancy_text,
+                  "Пройти квиз",
+                  web_app_url
+                )
+                Rails.logger.info "Photo with caption and button sent successfully"
+                $stdout.puts "[SUCCESS] Photo with caption and button sent successfully"
                 $stdout.flush
               rescue => e
-                Rails.logger.error "Failed to send photo: #{e.message}"
+                Rails.logger.error "Failed to send photo with caption and button: #{e.message}"
                 Rails.logger.error e.backtrace.join("\n")
-                $stdout.puts "[ERROR] Photo send failed: #{e.message}"
+                $stdout.puts "[ERROR] Failed to send photo with caption and button: #{e.message}"
+                $stdout.puts "[ERROR] Backtrace: #{e.backtrace.first(5).join("\n")}"
                 $stdout.flush
               end
             else
-              Rails.logger.warn "Logo file not found at #{logo_path}"
-              $stdout.puts "[WARN] Logo file not found at #{logo_path}"
+              Rails.logger.warn "Logo file not found at #{logo_path}, sending text only"
+              $stdout.puts "[WARN] Logo file not found at #{logo_path}, sending text only"
               $stdout.flush
+
+              # Fallback: если нет фото, отправляем хотя бы текст с кнопкой
+              send_message_with_button(chat_id, fancy_text, "Пройти квиз", web_app_url)
             end
           end
         end
@@ -349,6 +337,107 @@ class TelegramWebhookController < ApplicationController
     return false
   end
 
+  def send_photo_with_caption_and_button(chat_id, photo_path, caption, button_text, web_app_url)
+    unless bot_token
+      $stdout.puts "[ERROR] Bot token is nil! Cannot send photo."
+      $stdout.flush
+      Rails.logger.error "Bot token is nil! Cannot send photo."
+      return false
+    end
+
+    unless chat_id
+      $stdout.puts "[ERROR] Chat ID is nil! Cannot send photo."
+      $stdout.flush
+      Rails.logger.error "Chat ID is nil! Cannot send photo."
+      return false
+    end
+
+    return unless File.exist?(photo_path)
+
+    $stdout.puts "[SEND] Sending photo with caption and button to chat_id=#{chat_id}"
+    $stdout.flush
+    Rails.logger.info "Sending photo with caption and button to chat_id=#{chat_id}, web_app_url=#{web_app_url}"
+
+    uri = URI("https://api.telegram.org/bot#{bot_token}/sendPhoto")
+
+    # Создаем multipart form data
+    boundary = "----WebKitFormBoundary#{SecureRandom.hex(16)}"
+
+    # Читаем файл
+    file_content = File.binread(photo_path)
+
+    # Формируем reply_markup (inline keyboard) как JSON
+    reply_markup = {
+      inline_keyboard: [
+        [
+          {
+            text: button_text,
+            web_app: { url: web_app_url }
+          }
+        ]
+      ]
+    }.to_json
+
+    # Формируем body правильно для бинарных данных
+    body = String.new.force_encoding('BINARY')
+
+    body << "--#{boundary}\r\n"
+    body << "Content-Disposition: form-data; name=\"chat_id\"\r\n\r\n"
+    body << "#{chat_id}\r\n"
+
+    body << "--#{boundary}\r\n"
+    body << "Content-Disposition: form-data; name=\"caption\"\r\n\r\n"
+    body << "#{caption}\r\n"
+
+    body << "--#{boundary}\r\n"
+    body << "Content-Disposition: form-data; name=\"parse_mode\"\r\n\r\n"
+    body << "HTML\r\n"
+
+    body << "--#{boundary}\r\n"
+    body << "Content-Disposition: form-data; name=\"reply_markup\"\r\n\r\n"
+    body << "#{reply_markup}\r\n"
+
+    body << "--#{boundary}\r\n"
+    body << "Content-Disposition: form-data; name=\"photo\"; filename=\"logo.jpg\"\r\n"
+    body << "Content-Type: image/jpeg\r\n\r\n"
+    body << file_content
+    body << "\r\n"
+
+    body << "--#{boundary}--\r\n"
+
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.read_timeout = 10
+    request = Net::HTTP::Post.new(uri.path)
+    request['Content-Type'] = "multipart/form-data; boundary=#{boundary}"
+    request.body = body
+
+    response = http.request(request)
+    $stdout.puts "[SEND] Telegram API response (photo+caption+button): #{response.code}"
+    $stdout.puts "[SEND] Response body: #{response.body}"
+    $stdout.flush
+    Rails.logger.info "Telegram API response (photo+caption+button): #{response.code} #{response.body}"
+
+    if response.code.to_i == 200
+      $stdout.puts "[SUCCESS] Photo with caption and button sent successfully!"
+      $stdout.flush
+      return true
+    else
+      $stdout.puts "[ERROR] Failed to send photo with caption and button: #{response.body}"
+      $stdout.flush
+      Rails.logger.error "Failed to send photo with caption and button: #{response.body}"
+      return false
+    end
+  rescue => e
+    $stdout.puts "[ERROR] Error sending photo with caption and button: #{e.message}"
+    $stdout.puts "[ERROR] Exception class: #{e.class}"
+    $stdout.puts "[ERROR] Backtrace: #{e.backtrace.first(10).join("\n")}"
+    $stdout.flush
+    Rails.logger.error "Error sending photo with caption and button: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    return false
+  end
+
   def send_photo_simple(chat_id, photo_path)
     return unless bot_token
     return unless File.exist?(photo_path)
@@ -361,25 +450,25 @@ class TelegramWebhookController < ApplicationController
 
     # Используем более простой подход с правильным multipart
     boundary = "----WebKitFormBoundary#{SecureRandom.hex(16)}"
-    
+
     # Читаем файл
     file_content = File.binread(photo_path)
-    
+
     # Формируем body правильно для бинарных данных - создаем бинарную строку сразу
     body = String.new.force_encoding('BINARY')
-    
+
     body << "--#{boundary}\r\n"
     body << "Content-Disposition: form-data; name=\"chat_id\"\r\n\r\n"
     body << "#{chat_id}\r\n"
-    
+
     body << "--#{boundary}\r\n"
     body << "Content-Disposition: form-data; name=\"photo\"; filename=\"logo.jpg\"\r\n"
     body << "Content-Type: image/jpeg\r\n\r\n"
     body << file_content
     body << "\r\n"
-    
+
     body << "--#{boundary}--\r\n"
-    
+
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     request = Net::HTTP::Post.new(uri.path)
