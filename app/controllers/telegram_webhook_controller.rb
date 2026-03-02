@@ -102,9 +102,21 @@ class TelegramWebhookController < ApplicationController
         text = message["text"] || message[:text]
         
         Rails.logger.info "Message received - chat_id: #{chat_id}, text: #{text.inspect}"
+        $stdout.puts "[DEBUG] Message received - chat_id: #{chat_id}, text: #{text.inspect}"
+        $stdout.flush
         
         if text == '/start' || text&.start_with?('/start')
-          Rails.logger.info "Processing /start command"
+          Rails.logger.info "Processing /start command for chat_id: #{chat_id}"
+          $stdout.puts "[DEBUG] Processing /start command for chat_id: #{chat_id}"
+          $stdout.flush
+          
+          unless chat_id
+            Rails.logger.error "ERROR: chat_id is nil! Cannot send message."
+            $stdout.puts "[ERROR] chat_id is nil! Cannot send message."
+            $stdout.flush
+            next
+          end
+          
           web_app_url = ENV['TELEGRAM_WEB_APP_URL'] || 'https://telegram-quiz-sirr.onrender.com'
 
           fancy_text =
@@ -117,6 +129,10 @@ class TelegramWebhookController < ApplicationController
           logo_path = Rails.root.join('public', 'logo', 'logo.jpg')
           
           # СНАЧАЛА отправляем текст с кнопкой (гарантированно работает)
+          Rails.logger.info "Attempting to send message with button to chat_id: #{chat_id}"
+          $stdout.puts "[DEBUG] Attempting to send message with button to chat_id: #{chat_id}"
+          $stdout.flush
+          
           begin
             send_message_with_button(
               chat_id,
@@ -124,17 +140,27 @@ class TelegramWebhookController < ApplicationController
               "Пройти квиз",
               web_app_url
             )
+            Rails.logger.info "Message with button sent successfully"
+            $stdout.puts "[SUCCESS] Message with button sent successfully"
+            $stdout.flush
           rescue => e
             Rails.logger.error "Failed to send message with button: #{e.message}"
             Rails.logger.error e.backtrace.join("\n")
             $stdout.puts "[ERROR] Failed to send message: #{e.message}"
+            $stdout.puts "[ERROR] Backtrace: #{e.backtrace.first(5).join("\n")}"
             $stdout.flush
           end
           
           # ПОТОМ пытаемся отправить фото отдельно
           if File.exist?(logo_path)
+            Rails.logger.info "Attempting to send photo to chat_id: #{chat_id}"
+            $stdout.puts "[DEBUG] Attempting to send photo to chat_id: #{chat_id}"
+            $stdout.flush
             begin
               send_photo_simple(chat_id, logo_path)
+              Rails.logger.info "Photo sent successfully"
+              $stdout.puts "[SUCCESS] Photo sent successfully"
+              $stdout.flush
             rescue => e
               Rails.logger.error "Failed to send photo: #{e.message}"
               Rails.logger.error e.backtrace.join("\n")
@@ -210,7 +236,19 @@ class TelegramWebhookController < ApplicationController
   end
 
   def send_message_with_button(chat_id, text, button_text, web_app_url)
-    return unless bot_token
+    unless bot_token
+      $stdout.puts "[ERROR] Bot token is nil! Cannot send message."
+      $stdout.flush
+      Rails.logger.error "Bot token is nil! Cannot send message."
+      return false
+    end
+
+    unless chat_id
+      $stdout.puts "[ERROR] Chat ID is nil! Cannot send message."
+      $stdout.flush
+      Rails.logger.error "Chat ID is nil! Cannot send message."
+      return false
+    end
 
     $stdout.puts "[SEND] Sending message with button to chat_id=#{chat_id}"
     $stdout.flush
@@ -234,27 +272,40 @@ class TelegramWebhookController < ApplicationController
       }
     }
 
+    $stdout.puts "[DEBUG] Payload: #{payload.inspect}"
+    $stdout.flush
+
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
+    http.read_timeout = 10
     request = Net::HTTP::Post.new(uri.path)
     request['Content-Type'] = 'application/json'
     request.body = payload.to_json
 
     response = http.request(request)
     $stdout.puts "[SEND] Telegram API response (button): #{response.code}"
+    $stdout.puts "[SEND] Response body: #{response.body}"
     $stdout.flush
     Rails.logger.info "Telegram API response (button): #{response.code} #{response.body}"
 
-    unless response.code.to_i == 200
+    if response.code.to_i == 200
+      $stdout.puts "[SUCCESS] Message sent successfully!"
+      $stdout.flush
+      return true
+    else
       $stdout.puts "[ERROR] Failed to send button message: #{response.body}"
       $stdout.flush
       Rails.logger.error "Failed to send message with button: #{response.body}"
+      return false
     end
   rescue => e
     $stdout.puts "[ERROR] Error sending message with button: #{e.message}"
+    $stdout.puts "[ERROR] Exception class: #{e.class}"
+    $stdout.puts "[ERROR] Backtrace: #{e.backtrace.first(10).join("\n")}"
     $stdout.flush
     Rails.logger.error "Error sending message with button: #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
+    return false
   end
 
   def send_photo_simple(chat_id, photo_path)
