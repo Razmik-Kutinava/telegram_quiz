@@ -20,7 +20,7 @@
 | Переменная | Значение | Описание |
 |------------|----------|----------|
 | `RAILS_ENV` | `production` | Окружение Rails |
-| `RAILS_MASTER_KEY` | `[скопируй из config/master.key]` | Ключ для credentials |
+| `RAILS_MASTER_KEY` | `2f61e756517676fc68600bd7af6f8b8a` | Ключ для credentials |
 | `SECRET_KEY_BASE` | `99ffd25fc294c94681c6ad658bb163af2c85d667f7e378fe62ce21b8d849e1a6fb184f3913ccbec41e75cb094b3671825c1270b85769eeb16b6feca78f2cb226` | Секретный ключ |
 | `TELEGRAM_BOT_TOKEN` | `8761820883:AAFUdSvQxPhLbyn2fzpFbLc2VJIbis9fgho` | Токен бота |
 | `TELEGRAM_TOKEN` | `8761820883:AAFUdSvQxPhLbyn2fzpFbLc2VJIbis9fgho` | Дубликат токена |
