@@ -3,11 +3,11 @@
 
 Rails.application.config.after_initialize do
   token = ENV['TELEGRAM_BOT_TOKEN'] || ENV['TELEGRAM_TOKEN']
-  # prefer explicit webhook URL, otherwise build from TELEGRAM_WEB_APP_URL or default host
+  # prefer explicit webhook URL, otherwise build from TELEGRAM_WEB_APP_URL, TIMEWEB_URL or default host
   if ENV['TELEGRAM_WEBHOOK_URL'].present?
     webhook_url = ENV['TELEGRAM_WEBHOOK_URL']
   else
-    base = ENV['TELEGRAM_WEB_APP_URL'] || ENV['APP_BASE_URL'] || ''
+    base = ENV['TELEGRAM_WEB_APP_URL'] || ENV['TIMEWEB_URL'] || ENV['APP_BASE_URL'] || ''
     # if we don't yet know a base URL (e.g. during assets precompile), skip setting webhook
     webhook_url = base.present? ? "#{base.chomp('/')}" + "/telegram/webhook" : nil
   end

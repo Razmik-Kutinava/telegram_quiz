@@ -58,10 +58,13 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  # На Render используется RENDER_EXTERNAL_HOSTNAME или RENDER_EXTERNAL_URL
+  # Поддержка Render, Vercel и Timeweb
   render_host = ENV['RENDER_EXTERNAL_HOSTNAME'] || (ENV['RENDER_EXTERNAL_URL']&.gsub(/^https?:\/\//, ''))
+  vercel_host = ENV['VERCEL_URL']&.gsub(/^https?:\/\//, '')
+  timeweb_host = ENV['TIMEWEB_URL']&.gsub(/^https?:\/\//, '') || ENV['TIMEWEB_HOSTNAME'] || ENV['TELEGRAM_WEB_APP_URL']&.gsub(/^https?:\/\//, '')
+  app_host = render_host || vercel_host || timeweb_host || ENV['APP_HOST'] || "example.com"
   config.action_mailer.default_url_options = { 
-    host: render_host || "example.com"
+    host: app_host
   }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
@@ -84,17 +87,31 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [ :id ]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
-  # На Render разрешаем все хосты onrender.com
+  # Поддержка Render, Vercel и Timeweb хостов
   if ENV['RENDER_EXTERNAL_HOSTNAME']
     config.hosts << ENV['RENDER_EXTERNAL_HOSTNAME']
   end
+  if ENV['VERCEL_URL']
+    config.hosts << ENV['VERCEL_URL'].gsub(/^https?:\/\//, '')
+  end
+  if ENV['TIMEWEB_URL'] || ENV['TIMEWEB_HOSTNAME'] || ENV['TELEGRAM_WEB_APP_URL']
+    timeweb_host = ENV['TIMEWEB_URL']&.gsub(/^https?:\/\//, '') || ENV['TIMEWEB_HOSTNAME'] || ENV['TELEGRAM_WEB_APP_URL']&.gsub(/^https?:\/\//, '')
+    config.hosts << timeweb_host if timeweb_host
+  end
   config.hosts << /.*\.onrender\.com/
+  config.hosts << /.*\.vercel\.app/
+  config.hosts << /.*\.timeweb\.cloud/
+  config.hosts << /.*\.timeweb\.ru/
   
   # Skip DNS rebinding protection for the default health check endpoint and webhook endpoints.
+  # Также разрешаем внутренние запросы от балансировщика Timeweb (Docker сеть)
   config.host_authorization = { 
     exclude: ->(request) { 
       request.path == "/up" ||
-      request.path.start_with?("/telegram/") 
+      request.path.start_with?("/telegram/") ||
+      request.remote_ip&.start_with?("172.") || # Docker внутренняя сеть
+      request.remote_ip&.start_with?("10.") ||  # Docker внутренняя сеть
+      request.remote_ip == "127.0.0.1"          # localhost
     } 
   }
 end
