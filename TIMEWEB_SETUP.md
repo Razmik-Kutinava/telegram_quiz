@@ -1,9 +1,13 @@
 # Настройка приложения на Timeweb Cloud
 
+## ✅ Текущий URL приложения
+**https://razmik-kutinava-telegram-quiz-d64a.twc1.net**
+
 ## ✅ Что уже сделано в коде:
 - ✅ Поддержка Timeweb доменов в `production.rb`
 - ✅ Разрешение внутренних запросов от балансировщика (Docker сеть)
 - ✅ Автоматическая настройка webhook при запуске
+- ✅ Fallback URL обновлен на Timeweb адрес
 
 ## 🔧 Что нужно сделать в Timeweb Cloud Dashboard:
 
@@ -20,7 +24,7 @@
 | `SECRET_KEY_BASE` | `99ffd25fc294c94681c6ad658bb163af2c85d667f7e378fe62ce21b8d849e1a6fb184f3913ccbec41e75cb094b3671825c1270b85769eeb16b6feca78f2cb226` | Секретный ключ |
 | `TELEGRAM_BOT_TOKEN` | `8761820883:AAFUdSvQxPhLbyn2fzpFbLc2VJIbis9fgho` | Токен бота |
 | `TELEGRAM_TOKEN` | `8761820883:AAFUdSvQxPhLbyn2fzpFbLc2VJIbis9fgho` | Дубликат токена |
-| `TELEGRAM_WEB_APP_URL` | `https://[ваш-url-timeweb]` | **ВАЖНО!** URL вашего приложения от Timeweb |
+| `TELEGRAM_WEB_APP_URL` | `https://razmik-kutinava-telegram-quiz-d64a.twc1.net` | **ВАЖНО!** URL вашего приложения от Timeweb |
 | `RAILS_LOG_TO_STDOUT` | `true` | Логи в консоль |
 | `RAILS_SERVE_STATIC_FILES` | `true` | Раздача статики |
 | `PORT` | `3000` | Порт приложения |
@@ -30,16 +34,15 @@
 
 | Переменная | Значение | Описание |
 |------------|----------|----------|
-| `TIMEWEB_URL` | `https://[ваш-url-timeweb]` | Альтернативное имя для URL (дублирует TELEGRAM_WEB_APP_URL) |
+| `TIMEWEB_URL` | `https://razmik-kutinava-telegram-quiz-d64a.twc1.net` | Альтернативное имя для URL (дублирует TELEGRAM_WEB_APP_URL) |
 | `RAILS_LOG_LEVEL` | `info` | Уровень логирования |
 
 ### 2. Получить URL приложения
 
-После деплоя в Timeweb Cloud Dashboard:
-1. Найдите ваш проект
-2. Скопируйте **URL приложения** (например: `https://telegram-quiz-xxx.timeweb.cloud`)
-3. Обновите переменную `TELEGRAM_WEB_APP_URL` на этот URL
-4. Если используете `TIMEWEB_URL`, обновите и её тоже
+URL приложения уже известен: `https://razmik-kutinava-telegram-quiz-d64a.twc1.net`
+
+Убедитесь что в переменных окружения установлено:
+- `TELEGRAM_WEB_APP_URL` = `https://razmik-kutinava-telegram-quiz-d64a.twc1.net`
 
 ### 3. Перезапустить приложение
 
@@ -49,8 +52,8 @@
 
 ### 4. Проверить работу
 
-1. **Health check:** `https://[ваш-url-timeweb]/up` - должен вернуть 200 OK
-2. **Главная страница:** `https://[ваш-url-timeweb]/` - должна открыться
+1. **Health check:** `https://razmik-kutinava-telegram-quiz-d64a.twc1.net/up` - должен вернуть 200 OK
+2. **Главная страница:** `https://razmik-kutinava-telegram-quiz-d64a.twc1.net/` - должна открыться
 3. **Проверка webhook:** Отправьте `/start` боту в Telegram - должна появиться кнопка
 
 ## 🔍 Решение проблем
@@ -65,7 +68,7 @@
 
 **Решение:** 
 - Убедитесь что переменная `TELEGRAM_WEB_APP_URL` установлена и содержит полный URL (с `https://`)
-- Пример правильного значения: `https://telegram-quiz-xxx.timeweb.cloud`
+- Правильное значение: `https://razmik-kutinava-telegram-quiz-d64a.twc1.net`
 - После установки переменной перезапустите приложение
 
 ### Проблема: Приложение не отвечает
@@ -81,7 +84,7 @@
 1. Обновите Mini App URL в BotFather:
    - Откройте [@BotFather](https://t.me/BotFather)
    - `/myapps` → выберите бота → `/editapp`
-   - Укажите URL: `https://[ваш-url-timeweb]`
+   - Укажите URL: `https://razmik-kutinava-telegram-quiz-d64a.twc1.net`
 
 2. Проверьте что webhook установлен автоматически (должно быть в логах):
    ```
@@ -90,5 +93,5 @@
 
 3. Если webhook не установился автоматически, установите вручную:
    ```
-   https://api.telegram.org/bot8761820883:AAFUdSvQxPhLbyn2fzpFbLc2VJIbis9fgho/setWebhook?url=https://[ваш-url-timeweb]/telegram/webhook
+   https://api.telegram.org/bot8761820883:AAFUdSvQxPhLbyn2fzpFbLc2VJIbis9fgho/setWebhook?url=https://razmik-kutinava-telegram-quiz-d64a.twc1.net/telegram/webhook
    ```

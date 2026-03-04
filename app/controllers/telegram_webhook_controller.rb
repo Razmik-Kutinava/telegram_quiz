@@ -150,7 +150,7 @@ class TelegramWebhookController < ApplicationController
             $stdout.puts "[ERROR] chat_id is nil! Cannot send message."
             $stdout.flush
           else
-            web_app_url = ENV['TELEGRAM_WEB_APP_URL'] || 'https://telegram-quiz-sirr.onrender.com'
+            web_app_url = ENV['TELEGRAM_WEB_APP_URL'] || 'https://razmik-kutinava-telegram-quiz-d64a.twc1.net'
 
             fancy_text =
               "https://t.me/springbonus_bot\n" \
