@@ -1,81 +1,155 @@
-# Отладка Telegram Webhook
+# Отладка проблемы с webhook
 
-## Проблема: Бот не отвечает на /start
+## Проблема
+В логах нет записей о том, что webhook был установлен, и нет запросов от Telegram к `/telegram/webhook`.
 
-## Шаг 1: Проверьте что webhook настроен
+## Что было добавлено
 
-Выполните команду (замените YOUR_TOKEN на ваш токен):
+1. **Подробное логирование инициализации** - теперь в логах будет видно, что происходит при установке webhook
+2. **Endpoint для проверки webhook** - `/telegram/check_webhook` - показывает текущий статус webhook в Telegram
 
-```bash
-curl https://api.telegram.org/bot8761820883:AAFUdSvQxPhLbyn2fzpFbLc2VJIbis9fgho/getWebhookInfo
+## Что нужно сделать СЕЙЧАС
+
+### ШАГ 1: Перезапустить приложение в Timeweb Cloud
+
+1. Зайди в Timeweb Cloud Dashboard
+2. Найди проект `telegram-quiz`
+3. Нажми **"Restart"** или **"Redeploy"**
+4. Дождись завершения перезапуска (2-5 минут)
+
+### ШАГ 2: Проверить логи после перезапуска
+
+После перезапуска в логах ДОЛЖНЫ появиться записи:
+
+```
+================================================================================
+[INIT] Starting Telegram webhook setup...
+[INIT] Token present: true
+[INIT] TELEGRAM_BOT_TOKEN: SET
+[INIT] TELEGRAM_WEB_APP_URL: https://razmik-kutinava-telegram-quiz-d64a.twc1.net
+[INIT] Constructed webhook URL: https://razmik-kutinava-telegram-quiz-d64a.twc1.net/telegram/webhook
+[INIT] ✅ Telegram webhook successfully set: https://razmik-kutinava-telegram-quiz-d64a.twc1.net/telegram/webhook
+```
+
+**Если видишь ошибку или предупреждение, скопируй его и сообщи мне!**
+
+### ШАГ 3: Проверить webhook через браузер
+
+Открой в браузере:
+```
+https://razmik-kutinava-telegram-quiz-d64a.twc1.net/telegram/check_webhook
+```
+
+Должно показать JSON с информацией о webhook:
+```json
+{
+  "ok": true,
+  "webhook_info": {
+    "url": "https://razmik-kutinava-telegram-quiz-d64a.twc1.net/telegram/webhook",
+    "pending_update_count": 0
+  },
+  "expected_url": "https://razmik-kutinava-telegram-quiz-d64a.twc1.net/telegram/webhook"
+}
+```
+
+**Если `url` пустой или отличается от `expected_url`, значит webhook не установлен!**
+
+### ШАГ 4: Проверить переменные окружения
+
+Открой в браузере:
+```
+https://razmik-kutinava-telegram-quiz-d64a.twc1.net/telegram/check_env
+```
+
+Должно показать:
+```json
+{
+  "token_set": true,
+  "token_source": "TELEGRAM_BOT_TOKEN",
+  "token_length": 46,
+  "web_app_url": "https://razmik-kutinava-telegram-quiz-d64a.twc1.net"
+}
+```
+
+**Если `token_set: false` или `web_app_url` пустой, значит переменные окружения не установлены!**
+
+### ШАГ 5: Если webhook не установлен - установить вручную
+
+Если в логах видишь ошибку или webhook не установлен, можно установить его вручную через браузер:
+
+```
+https://api.telegram.org/bot8761820883:AAFUdSvQxPhLbyn2fzpFbLc2VJIbis9fgho/setWebhook?url=https://razmik-kutinava-telegram-quiz-d64a.twc1.net/telegram/webhook
 ```
 
 Должно вернуть:
 ```json
 {
   "ok": true,
-  "result": {
-    "url": "https://telegram-quiz-sirr.onrender.com/telegram/webhook",
-    "has_custom_certificate": false,
-    "pending_update_count": 0
-  }
+  "result": true,
+  "description": "Webhook was set"
 }
 ```
 
-Если `url` неправильный или пустой, настройте webhook:
+### ШАГ 6: Протестировать бота
 
-```bash
-curl -F "url=https://telegram-quiz-sirr.onrender.com/telegram/webhook" \
-  https://api.telegram.org/bot8761820883:AAFUdSvQxPhLbyn2fzpFbLc2VJIbis9fgho/setWebhook
+1. Открой Telegram
+2. Найди бота `@springbonus_bot`
+3. Отправь команду `/start`
+4. Должно появиться сообщение с текстом и кнопкой "Пройти квиз"
+
+**После отправки `/start` в логах Timeweb Cloud ДОЛЖЕН появиться запрос:**
+```
+================================================================================
+[REQUEST_LOGGER] POST /telegram/webhook
+[CONTROLLER] POST /telegram/webhook
+[DEBUG] Message received - chat_id: 219951825, text: "/start"
+[DEBUG] Processing /start command for chat_id: 219951825
 ```
 
-## Шаг 2: Проверьте логи в Render
+## Возможные проблемы и решения
 
-1. Откройте Render Dashboard
-2. Выберите ваш сервис
-3. Перейдите в раздел "Logs"
-4. Отправьте `/start` боту
-5. В логах должно появиться:
-   ```
-   === WEBHOOK CALLED ===
-   Method: POST
-   Content-Type: application/json
-   ...
-   ```
+### Проблема 1: В логах нет записей `[INIT]`
 
-Если в логах НЕТ записей "=== WEBHOOK CALLED ===" - значит webhook вообще не вызывается.
+**Причина:** Initializer не выполняется или переменные окружения не установлены
 
-## Шаг 3: Проверьте переменные окружения
+**Решение:**
+1. Проверь переменные окружения в Timeweb Cloud Dashboard
+2. Убедись, что `TELEGRAM_BOT_TOKEN` и `TELEGRAM_WEB_APP_URL` установлены
+3. Перезапусти приложение
 
-В Render Dashboard → Environment Variables должны быть:
-- `TELEGRAM_BOT_TOKEN` = `8761820883:AAFUdSvQxPhLbyn2fzpFbLc2VJIbis9fgho`
-- `TELEGRAM_WEB_APP_URL` = `https://telegram-quiz-sirr.onrender.com`
+### Проблема 2: Webhook не установлен (проверка через `/telegram/check_webhook`)
 
-## Шаг 4: Проверьте что приложение работает
+**Причина:** Telegram API не может установить webhook или URL недоступен
 
-Откройте в браузере:
-- https://telegram-quiz-sirr.onrender.com/up - должно вернуть `{"status":"ok"}`
+**Решение:**
+1. Установи webhook вручную через браузер (ШАГ 5)
+2. Проверь, что URL доступен извне (должен возвращать 200 OK)
+3. Проверь, что используется HTTPS (Telegram требует HTTPS)
 
-## Шаг 5: Тестовый запрос к webhook
+### Проблема 3: Webhook установлен, но запросы не приходят
 
-Попробуйте отправить тестовый запрос:
+**Причина:** Telegram не может достучаться до webhook URL
 
-```bash
-curl -X POST https://telegram-quiz-sirr.onrender.com/telegram/webhook \
-  -H "Content-Type: application/json" \
-  -d '{"message":{"chat":{"id":123456},"text":"/start"}}'
-```
+**Решение:**
+1. Проверь, что URL доступен извне: `curl https://razmik-kutinava-telegram-quiz-d64a.twc1.net/telegram/webhook`
+2. Проверь логи - возможно, запросы блокируются
+3. Проверь, что порт 3000 открыт и доступен
 
-В логах Render должно появиться:
-```
-=== WEBHOOK CALLED ===
-Message received - chat_id: 123456, text: "/start"
-Processing /start command
-```
+## Что проверить в Timeweb Cloud Dashboard
 
-## Если ничего не помогает:
+1. **Переменные окружения:**
+   - `TELEGRAM_BOT_TOKEN` = `8761820883:AAFUdSvQxPhLbyn2fzpFbLc2VJIbis9fgho`
+   - `TELEGRAM_WEB_APP_URL` = `https://razmik-kutinava-telegram-quiz-d64a.twc1.net`
 
-1. Убедитесь что сервис перезапущен после изменений
-2. Проверьте что webhook URL правильный (без лишних слешей)
-3. Проверьте что токен бота правильный
-4. Посмотрите полные логи в Render - там должны быть все ошибки
+2. **Статус приложения:** должно быть "Running"
+
+3. **Логи:** должны быть записи `[INIT]` при запуске
+
+## Резюме
+
+✅ Добавлено подробное логирование  
+✅ Добавлен endpoint для проверки webhook  
+⏳ Нужно перезапустить приложение  
+⏳ Проверить логи после перезапуска  
+⏳ Проверить webhook через `/telegram/check_webhook`  
+⏳ Если webhook не установлен - установить вручную
