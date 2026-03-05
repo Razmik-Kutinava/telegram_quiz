@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   post "telegram/webhook", to: "telegram_webhook#webhook"
   post "telegram/test", to: "telegram_webhook#test"
   get "telegram/check_env", to: "telegram_webhook#check_env"
+  get "telegram/check_webhook", to: "telegram_webhook#check_webhook"
 
   # API для сохранения результатов квиза
   namespace :api do

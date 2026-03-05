@@ -6,15 +6,32 @@ require 'uri'
 require 'json'
 
 Rails.application.config.after_initialize do
+  # Принудительно выводим в STDOUT с flush
+  $stdout.puts "=" * 80
+  $stdout.puts "[INIT] Starting Telegram webhook setup..."
+  $stdout.flush
+  
   token = ENV['TELEGRAM_BOT_TOKEN'] || ENV['TELEGRAM_TOKEN']
+  $stdout.puts "[INIT] Token present: #{token.present?}"
+  $stdout.puts "[INIT] TELEGRAM_BOT_TOKEN: #{ENV['TELEGRAM_BOT_TOKEN'] ? 'SET' : 'NOT SET'}"
+  $stdout.puts "[INIT] TELEGRAM_TOKEN: #{ENV['TELEGRAM_TOKEN'] ? 'SET' : 'NOT SET'}"
+  $stdout.flush
+  
   # prefer explicit webhook URL, otherwise build from TELEGRAM_WEB_APP_URL, TIMEWEB_URL or default host
   if ENV['TELEGRAM_WEBHOOK_URL'].present?
     webhook_url = ENV['TELEGRAM_WEBHOOK_URL']
+    $stdout.puts "[INIT] Using TELEGRAM_WEBHOOK_URL: #{webhook_url}"
   else
     base = ENV['TELEGRAM_WEB_APP_URL'] || ENV['TIMEWEB_URL'] || ENV['APP_BASE_URL'] || ''
+    $stdout.puts "[INIT] TELEGRAM_WEB_APP_URL: #{ENV['TELEGRAM_WEB_APP_URL'] || 'NOT SET'}"
+    $stdout.puts "[INIT] TIMEWEB_URL: #{ENV['TIMEWEB_URL'] || 'NOT SET'}"
+    $stdout.puts "[INIT] APP_BASE_URL: #{ENV['APP_BASE_URL'] || 'NOT SET'}"
+    $stdout.puts "[INIT] Base URL: #{base.inspect}"
     # if we don't yet know a base URL (e.g. during assets precompile), skip setting webhook
     webhook_url = base.present? ? "#{base.chomp('/')}" + "/telegram/webhook" : nil
+    $stdout.puts "[INIT] Constructed webhook URL: #{webhook_url.inspect}"
   end
+  $stdout.flush
 
   if token.present?
     if webhook_url.present?

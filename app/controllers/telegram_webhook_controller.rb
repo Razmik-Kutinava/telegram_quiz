@@ -44,6 +44,29 @@ class TelegramWebhookController < ApplicationController
     render json: { status: "ok", message: "POST works!", method: request.method }
   end
   
+  # Endpoint для проверки webhook статуса
+  def check_webhook
+    token = ENV['TELEGRAM_BOT_TOKEN'] || ENV['TELEGRAM_TOKEN']
+    unless token
+      render json: { error: "Token not set" }, status: :bad_request
+      return
+    end
+    
+    begin
+      uri = URI("https://api.telegram.org/bot#{token}/getWebhookInfo")
+      response = Net::HTTP.get_response(uri)
+      result = JSON.parse(response.body)
+      
+      render json: {
+        ok: result['ok'],
+        webhook_info: result['result'],
+        expected_url: ENV['TELEGRAM_WEBHOOK_URL'] || "#{ENV['TELEGRAM_WEB_APP_URL'] || ENV['TIMEWEB_URL'] || 'NOT SET'}/telegram/webhook"
+      }
+    rescue => e
+      render json: { error: e.message }, status: :internal_server_error
+    end
+  end
+  
   # Endpoint для проверки переменных окружения (только для диагностики)
   def check_env
     token = ENV['TELEGRAM_BOT_TOKEN'] || ENV['TELEGRAM_TOKEN']
