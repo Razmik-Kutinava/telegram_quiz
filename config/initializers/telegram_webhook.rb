@@ -1,6 +1,10 @@
 # Ensure Telegram webhook is configured on app boot. This makes the bot
 # registration more resilient when the app is redeployed.
 
+require 'net/http'
+require 'uri'
+require 'json'
+
 Rails.application.config.after_initialize do
   token = ENV['TELEGRAM_BOT_TOKEN'] || ENV['TELEGRAM_TOKEN']
   # prefer explicit webhook URL, otherwise build from TELEGRAM_WEB_APP_URL, TIMEWEB_URL or default host
@@ -15,27 +19,39 @@ Rails.application.config.after_initialize do
   if token.present?
     if webhook_url.present?
       begin
+        # Используем POST запрос с JSON body (правильный способ для Telegram API)
         uri = URI("https://api.telegram.org/bot#{token}/setWebhook")
-        params = { url: webhook_url }
-        uri.query = URI.encode_www_form(params)
-
+        
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
-        request = Net::HTTP::Get.new(uri)
+        http.read_timeout = 10
+        
+        request = Net::HTTP::Post.new(uri.path)
+        request['Content-Type'] = 'application/json'
+        request.body = { url: webhook_url }.to_json
+        
         response = http.request(request)
+        result = JSON.parse(response.body) rescue nil
 
-        Rails.logger.info "Telegram webhook set response: #{response.code} #{response.body}"
-        $stdout.puts "[INIT] Telegram webhook set response: #{response.code} #{response.body}"
+        if result && result['ok']
+          Rails.logger.info "Telegram webhook successfully set: #{webhook_url}"
+          $stdout.puts "[INIT] ✅ Telegram webhook successfully set: #{webhook_url}"
+        else
+          Rails.logger.error "Failed to set Telegram webhook: #{response.code} #{response.body}"
+          $stdout.puts "[INIT] ❌ Failed to set Telegram webhook: #{response.code} #{response.body}"
+        end
       rescue => e
         Rails.logger.error "Failed to set Telegram webhook: #{e.message}"
-        $stdout.puts "[INIT] Failed to set Telegram webhook: #{e.message}"
+        Rails.logger.error e.backtrace.first(5).join("\n")
+        $stdout.puts "[INIT] ❌ Failed to set Telegram webhook: #{e.message}"
+        $stdout.puts "[INIT] Backtrace: #{e.backtrace.first(5).join("\n")}"
       end
     else
       Rails.logger.warn "Webhook URL could not be determined; skipping setWebhook"
-      $stdout.puts "[INIT] Webhook URL could not be determined; skipping setWebhook"
+      $stdout.puts "[INIT] ⚠️  Webhook URL could not be determined; skipping setWebhook"
     end
   else
     Rails.logger.warn "Telegram token missing, cannot set webhook in initializer"
-    $stdout.puts "[INIT] Telegram token missing, cannot set webhook in initializer"
+    $stdout.puts "[INIT] ⚠️  Telegram token missing, cannot set webhook in initializer"
   end
 end
