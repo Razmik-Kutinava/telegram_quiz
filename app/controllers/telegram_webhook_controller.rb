@@ -176,10 +176,10 @@ class TelegramWebhookController < ApplicationController
             web_app_url = ENV['TELEGRAM_WEB_APP_URL'] || 'https://razmik-kutinava-telegram-quiz-d64a.twc1.net'
 
             fancy_text =
-              "https://t.me/springbonus_bot\n" \
-              "Я — Клубничный Имбирь #68 🍹\n\n" \
-              "А ты какой? \n" \
-              "Пройти квиз: @springbonus_bot"
+              "🌸 Весенний квиз · НАПИ:БАР 🌸\n\n" \
+              "Узнай свой весенний вкус и получи -10% на сезонное меню\n" \
+              "до 31 марта в нашем баре.\n\n" \
+              "Нажми «Пройти квиз», чтобы начать весну ярко. 🍹"
 
             # Раньше отправляли фото с логотипом, теперь текст только
             send_message_with_button(chat_id, fancy_text, "Пройти квиз", web_app_url)
