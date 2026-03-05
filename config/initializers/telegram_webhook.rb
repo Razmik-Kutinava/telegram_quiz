@@ -22,13 +22,24 @@ Rails.application.config.after_initialize do
     webhook_url = ENV['TELEGRAM_WEBHOOK_URL']
     $stdout.puts "[INIT] Using TELEGRAM_WEBHOOK_URL: #{webhook_url}"
   else
-    base = ENV['TELEGRAM_WEB_APP_URL'] || ENV['TIMEWEB_URL'] || ENV['APP_BASE_URL'] || ''
+    # Пробуем получить базовый URL из разных переменных окружения
+    base = ENV['TELEGRAM_WEB_APP_URL'] || ENV['TIMEWEB_URL'] || ENV['APP_BASE_URL'] || ENV['APP_HOST']
+    
+    # Если ничего не найдено, используем дефолтный URL для Timeweb Cloud
+    if base.blank?
+      base = 'https://razmik-kutinava-telegram-quiz-d64a.twc1.net'
+      $stdout.puts "[INIT] ⚠️  No base URL found in env vars, using default Timeweb URL: #{base}"
+    end
+    
     $stdout.puts "[INIT] TELEGRAM_WEB_APP_URL: #{ENV['TELEGRAM_WEB_APP_URL'] || 'NOT SET'}"
     $stdout.puts "[INIT] TIMEWEB_URL: #{ENV['TIMEWEB_URL'] || 'NOT SET'}"
     $stdout.puts "[INIT] APP_BASE_URL: #{ENV['APP_BASE_URL'] || 'NOT SET'}"
+    $stdout.puts "[INIT] APP_HOST: #{ENV['APP_HOST'] || 'NOT SET'}"
     $stdout.puts "[INIT] Base URL: #{base.inspect}"
-    # if we don't yet know a base URL (e.g. during assets precompile), skip setting webhook
-    webhook_url = base.present? ? "#{base.chomp('/')}" + "/telegram/webhook" : nil
+    
+    # Убираем протокол если есть, потом добавим обратно
+    base_without_protocol = base.gsub(/^https?:\/\//, '')
+    webhook_url = "https://#{base_without_protocol.chomp('/')}/telegram/webhook"
     $stdout.puts "[INIT] Constructed webhook URL: #{webhook_url.inspect}"
   end
   $stdout.flush
