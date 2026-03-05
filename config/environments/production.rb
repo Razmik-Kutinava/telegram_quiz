@@ -28,7 +28,8 @@ Rails.application.configure do
   config.assume_ssl = true
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  # Отключаем force_ssl для Timeweb, так как они проксируют через HTTP
+  # config.force_ssl = true
 
   # Skip http-to-https redirect for the default health check endpoint.
   config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
@@ -102,16 +103,21 @@ Rails.application.configure do
   config.hosts << /.*\.vercel\.app/
   config.hosts << /.*\.timeweb\.cloud/
   config.hosts << /.*\.timeweb\.ru/
+  config.hosts << /.*\.twc1\.net/  # Timeweb Cloud домены
   
-  # Skip DNS rebinding protection for the default health check endpoint and webhook endpoints.
-  # Также разрешаем внутренние запросы от балансировщика Timeweb (Docker сеть)
+  # Skip DNS rebinding protection для всех запросов через балансировщик Timeweb
+  # Timeweb использует reverse proxy, поэтому разрешаем все запросы
   config.host_authorization = { 
     exclude: ->(request) { 
-      request.path == "/up" ||
-      request.path.start_with?("/telegram/") ||
+      # Разрешаем все запросы через балансировщик Timeweb
       request.remote_ip&.start_with?("172.") || # Docker внутренняя сеть
       request.remote_ip&.start_with?("10.") ||  # Docker внутренняя сеть
-      request.remote_ip == "127.0.0.1"          # localhost
+      request.remote_ip == "127.0.0.1" ||       # localhost
+      request.host&.end_with?(".twc1.net") ||   # Timeweb Cloud домены
+      request.host&.end_with?(".timeweb.cloud") || # Timeweb Cloud домены
+      request.host&.end_with?(".timeweb.ru") || # Timeweb домены
+      request.path == "/up" ||                  # Health check
+      request.path.start_with?("/telegram/")    # Webhook endpoints
     } 
   }
 end
