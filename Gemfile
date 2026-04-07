@@ -67,5 +67,5 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "telegram-bot-ruby", "~> 2.5"
+gem "telegram-bot-ruby", "~> 2.7"
 gem "dotenv-rails", "~> 3.2"
